@@ -1,0 +1,27 @@
+import { prisma } from "@/lib/prisma";
+import { todayISO } from "@/lib/date";
+
+export { todayISO };
+
+export async function getTransfers(scope: { hotelId?: string; taxiCompanyId?: string }, filters: { date?: string; q?: string }) {
+  const where: Record<string, unknown> = {};
+  if (scope.hotelId) where.hotelId = scope.hotelId;
+  if (scope.taxiCompanyId) where.taxiCompanyId = scope.taxiCompanyId;
+
+  if (filters.q && filters.q.trim().length > 0) {
+    const q = filters.q.trim();
+    where.OR = [
+      { guestName: { contains: q } },
+      { bookingNumber: { contains: q } },
+      { roomNumber: { contains: q } },
+    ];
+  } else {
+    where.date = filters.date ?? todayISO();
+  }
+
+  return prisma.transfer.findMany({
+    where,
+    include: { driver: true },
+    orderBy: [{ date: "asc" }, { time: "asc" }],
+  });
+}

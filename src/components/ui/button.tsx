@@ -1,0 +1,51 @@
+import { cn } from "@/lib/cn";
+import Link from "next/link";
+import type { ButtonHTMLAttributes } from "react";
+
+type Variant = "primary" | "secondary" | "danger" | "ghost" | "outline";
+type Size = "sm" | "md";
+
+const variants: Record<Variant, string> = {
+  primary: "bg-slate-900 text-white hover:bg-slate-700 disabled:bg-slate-300",
+  secondary: "bg-blue-600 text-white hover:bg-blue-500 disabled:bg-blue-300",
+  danger: "bg-red-600 text-white hover:bg-red-500 disabled:bg-red-300",
+  ghost: "bg-transparent text-slate-700 hover:bg-slate-100",
+  outline: "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50",
+};
+
+const sizes: Record<Size, string> = {
+  sm: "px-2.5 py-1.5 text-xs",
+  md: "px-4 py-2 text-sm",
+};
+
+const base =
+  "inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition-colors disabled:cursor-not-allowed cursor-pointer";
+
+export function Button({
+  variant = "primary",
+  size = "md",
+  className,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
+  return <button className={cn(base, variants[variant], sizes[size], className)} {...props} />;
+}
+
+export function LinkButton({
+  href,
+  variant = "primary",
+  size = "md",
+  className,
+  children,
+}: {
+  href: string;
+  variant?: Variant;
+  size?: Size;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link href={href} className={cn(base, variants[variant], sizes[size], className)}>
+      {children}
+    </Link>
+  );
+}

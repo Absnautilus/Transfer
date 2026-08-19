@@ -1,0 +1,231 @@
+// Prisma schema — Hotel Transfer Automation
+// SQLite does not support native enums; status/role fields are plain
+// Strings constrained by the shared constants in src/lib/constants.ts
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------------------------------------------------------------------------
+// Organizations
+// ---------------------------------------------------------------------------
+
+model Hotel {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique // used in the public questionnaire URL
+  address   String?
+  email     String? // receives copies of notifications
+  phone     String?
+  createdAt DateTime @default(now())
+
+  primaryTaxiCompanyId String?
+  primaryTaxiCompany   TaxiCompany? @relation(fields: [primaryTaxiCompanyId], references: [id], onDelete: SetNull)
+
+  users    User[]
+  routes   HotelRoute[]
+  requests TransferRequest[]
+  transfers Transfer[]
+}
+
+model TaxiCompany {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+
+  users     User[]
+  drivers   Driver[]
+  transfers Transfer[]
+  hotelsUsingAsPrimary Hotel[]
+}
+
+model HotelRoute {
+  id           String  @id @default(cuid())
+  hotelId      String
+  hotel        Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  label        String // e.g. "SAN BASILIO >>> VCE"
+  defaultPrice Float?
+  active       Boolean @default(true)
+  sortOrder    Int     @default(0)
+
+  @@index([hotelId])
+}
+
+// ---------------------------------------------------------------------------
+// Users & drivers
+// ---------------------------------------------------------------------------
+
+// role: HOTEL_STAFF | TAXI_STAFF | DRIVER | ADMIN
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String
+  phone        String?
+  createdAt    DateTime @default(now())
+
+  hotelId       String?
+  hotel         Hotel?       @relation(fields: [hotelId], references: [id], onDelete: SetNull)
+  taxiCompanyId String?
+  taxiCompany   TaxiCompany? @relation(fields: [taxiCompanyId], references: [id], onDelete: SetNull)
+  driverId      String?      @unique
+  driver        Driver?      @relation(fields: [driverId], references: [id], onDelete: SetNull)
+
+  reviewedRequests TransferRequest[] @relation("RequestReviewedBy")
+  createdTransfers  Transfer[]       @relation("TransferCreatedBy")
+  updatedTransfers  Transfer[]       @relation("TransferUpdatedBy")
+
+  @@index([hotelId])
+  @@index([taxiCompanyId])
+}
+
+model Driver {
+  id            String      @id @default(cuid())
+  taxiCompanyId String
+  taxiCompany   TaxiCompany @relation(fields: [taxiCompanyId], references: [id], onDelete: Cascade)
+  name          String
+  phone         String
+  vehicleInfo   String?
+  active        Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+
+  account   User?
+  transfers Transfer[]
+
+  @@index([taxiCompanyId])
+}
+
+// ---------------------------------------------------------------------------
+// Requests (guest questionnaire submissions, pending hotel review)
+// ---------------------------------------------------------------------------
+
+// status: PENDING | ACCEPTED | REJECTED
+model TransferRequest {
+  id       String @id @default(cuid())
+  hotelId  String
+  hotel    Hotel  @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  status   String @default("PENDING")
+
+  // Guest-provided info
+  guestName      String
+  guestEmail     String
+  guestPhone     String
+  roomNumber     String?
+  bookingNumber  String?
+  pax            Int
+  bags           String?
+  date           String // YYYY-MM-DD
+  time           String // HH:mm
+  isNightService Boolean @default(false)
+  routeLabel     String? // chosen standard route
+  routeFrom      String? // used when routeLabel is empty (custom route)
+  routeTo        String?
+  flightOrTrainNumber String?
+  flightOrTrainOrigin String?
+  notes          String?
+
+  // Review outcome
+  reviewedAt       DateTime?
+  reviewedByUserId String?
+  reviewedByUser   User?    @relation("RequestReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull)
+  rejectionReason  String?
+
+  transfer  Transfer?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hotelId, status])
+  @@index([hotelId, date])
+}
+
+// ---------------------------------------------------------------------------
+// Confirmed transfers (shared hotel <-> taxi company table)
+// ---------------------------------------------------------------------------
+
+// status: AWAITING_TAXI | CONFIRMED | REJECTED_BY_TAXI | ASSIGNED | IN_PROGRESS | COMPLETED | CANCELLED
+model Transfer {
+  id            String       @id @default(cuid())
+  hotelId       String
+  hotel         Hotel        @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  taxiCompanyId String?
+  taxiCompany   TaxiCompany? @relation(fields: [taxiCompanyId], references: [id], onDelete: SetNull)
+
+  requestId String?          @unique
+  request   TransferRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  status String @default("AWAITING_TAXI")
+
+  guestName      String
+  guestEmail     String?
+  guestPhone     String?
+  roomNumber     String?
+  bookingNumber  String?
+  pax            Int
+  bags           String?
+  date           String // YYYY-MM-DD
+  time           String // HH:mm
+  isNightService Boolean @default(false)
+  routeFrom      String
+  routeTo        String
+  flightOrTrainNumber String?
+  flightOrTrainOrigin String?
+  notes          String?
+  price          Float?
+  operatorInitials String?
+
+  taxiRejectionReason String?
+
+  driverId String?
+  driver   Driver? @relation(fields: [driverId], references: [id], onDelete: SetNull)
+
+  guestTrackingToken String  @unique @default(cuid())
+  tripStartedAt       DateTime?
+  tripCompletedAt      DateTime?
+
+  createdByUserId String?
+  createdByUser   User?   @relation("TransferCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  updatedByUserId String?
+  updatedByUser   User?   @relation("TransferUpdatedBy", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  statusEvents TripStatusEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([hotelId, date])
+  @@index([taxiCompanyId, date])
+  @@index([driverId])
+  @@index([bookingNumber])
+  @@index([guestName])
+}
+
+// status snapshots for the driver/guest shared trip screen
+model TripStatusEvent {
+  id         String   @id @default(cuid())
+  transferId String
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  status     String // ASSIGNED | EN_ROUTE | ARRIVED | STARTED | COMPLETED
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([transferId])
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  body      String
+  status    String   @default("SENT") // SENT | FAILED
+  error     String?
+  createdAt DateTime @default(now())
+}

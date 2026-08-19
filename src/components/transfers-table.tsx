@@ -1,0 +1,102 @@
+import { StatusBadge } from "@/components/ui/badge";
+import { TaxiRowActions } from "@/components/taxi-row-actions";
+import { HotelRowActions } from "@/components/hotel-row-actions";
+
+type Transfer = {
+  id: string;
+  date: string;
+  time: string;
+  isNightService: boolean;
+  guestName: string;
+  roomNumber: string | null;
+  bookingNumber: string | null;
+  pax: number;
+  bags: string | null;
+  routeFrom: string;
+  routeTo: string;
+  flightOrTrainNumber: string | null;
+  flightOrTrainOrigin: string | null;
+  status: string;
+  driverId: string | null;
+  driver: { id: string; name: string } | null;
+};
+
+type Driver = { id: string; name: string; active: boolean };
+
+export function TransfersTable({
+  transfers,
+  scope,
+  drivers,
+}: {
+  transfers: Transfer[];
+  scope: "hotel" | "taxi";
+  drivers?: Driver[];
+}) {
+  if (transfers.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
+        Nessun transfer trovato per i filtri selezionati.
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+      <table className="w-full min-w-[900px] text-sm">
+        <thead className="bg-slate-50 text-left text-xs uppercase text-slate-400">
+          <tr>
+            <th className="px-3 py-2">Ora</th>
+            <th className="px-3 py-2">Ospite</th>
+            <th className="px-3 py-2">Camera / Pren.</th>
+            <th className="px-3 py-2">Pax / Bagagli</th>
+            <th className="px-3 py-2">Tratta</th>
+            <th className="px-3 py-2">Volo / Treno</th>
+            <th className="px-3 py-2">Stato</th>
+            <th className="px-3 py-2">Autista</th>
+            <th className="px-3 py-2">Azioni</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {transfers.map((t) => (
+            <tr key={t.id} className="align-top">
+              <td className="whitespace-nowrap px-3 py-3 font-medium text-slate-900">
+                {t.time}
+                {t.isNightService && <div className="text-xs font-normal text-indigo-600">notturno</div>}
+                <div className="text-xs font-normal text-slate-400">{t.date}</div>
+              </td>
+              <td className="px-3 py-3">{t.guestName}</td>
+              <td className="px-3 py-3 text-slate-600">
+                {t.roomNumber || "—"}
+                {t.bookingNumber && <div className="text-xs text-slate-400">{t.bookingNumber}</div>}
+              </td>
+              <td className="px-3 py-3 text-slate-600">
+                {t.pax} pax
+                {t.bags && <div className="text-xs text-slate-400">{t.bags}</div>}
+              </td>
+              <td className="px-3 py-3 text-slate-600">
+                {t.routeFrom} → {t.routeTo}
+              </td>
+              <td className="px-3 py-3 text-slate-600">
+                {t.flightOrTrainNumber || "—"}
+                {t.flightOrTrainOrigin && <div className="text-xs text-slate-400">{t.flightOrTrainOrigin}</div>}
+              </td>
+              <td className="px-3 py-3">
+                <StatusBadge status={t.status} />
+              </td>
+              <td className="px-3 py-3 text-slate-600">
+                {scope === "hotel" ? t.driver?.name ?? "—" : null}
+              </td>
+              <td className="px-3 py-3">
+                {scope === "taxi" ? (
+                  <TaxiRowActions transferId={t.id} status={t.status} driverId={t.driverId} drivers={drivers ?? []} />
+                ) : (
+                  <HotelRowActions transferId={t.id} date={t.date} status={t.status} />
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
