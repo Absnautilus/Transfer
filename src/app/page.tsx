@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { LinkButton } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 
+// Lists hotels from the database — must read at request time, not be
+// baked into a static page at build time (new hotels wouldn't show up,
+// and the build itself would depend on the database being reachable).
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const hotels = await prisma.hotel.findMany({ select: { name: true, slug: true }, take: 5 });
 
