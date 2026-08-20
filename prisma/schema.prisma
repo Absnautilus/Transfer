@@ -1,6 +1,7 @@
 // Prisma schema — Hotel Transfer Automation
-// SQLite does not support native enums; status/role fields are plain
-// Strings constrained by the shared constants in src/lib/constants.ts
+// status/role fields are plain Strings constrained by the shared constants
+// in src/lib/constants.ts (kept as strings rather than native enums so the
+// same schema could still target a non-Postgres database if ever needed).
 
 generator client {
   provider = "prisma-client"
@@ -8,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ---------------------------------------------------------------------------

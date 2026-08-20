@@ -2,13 +2,14 @@
 // For importing real historical bookings from a CSV export, use
 // `npm run import:csv -- /path/to/file.csv` (see scripts/import-ncc-csv.ts);
 // that data is never written into this file or into git.
+import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { ROLES, TRANSFER_STATUS, TRIP_EVENT } from "../src/lib/constants";
 import { format, addDays } from "date-fns";
 
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL ?? "file:./dev.db" });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
