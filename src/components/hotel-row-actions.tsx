@@ -12,7 +12,7 @@ export function HotelRowActions({ transferId, date, status }: { transferId: stri
 
   return (
     <div className="flex items-center gap-2">
-      <Link href={`/hotel/transfer/${transferId}?date=${date}`} className="text-sm font-medium text-blue-600 hover:underline">
+      <Link href={`/hotel/transfer/${transferId}?date=${date}`} className="text-sm font-medium text-purple-600 hover:underline">
         Modifica
       </Link>
       {!cancelled && (

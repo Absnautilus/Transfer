@@ -61,7 +61,7 @@ export function TransfersTable({
             <tr key={t.id} className="align-top">
               <td className="whitespace-nowrap px-3 py-3 font-medium text-slate-900">
                 {t.time}
-                {t.isNightService && <div className="text-xs font-normal text-indigo-600">notturno</div>}
+                {t.isNightService && <div className="text-xs font-normal text-purple-600">notturno</div>}
                 <div className="text-xs font-normal text-slate-400">{t.date}</div>
               </td>
               <td className="px-3 py-3">{t.guestName}</td>

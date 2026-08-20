@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
+import { isRedirectError } from "@/lib/is-redirect-error";
 
 export type TransferFormValues = {
   transferId?: string;
@@ -45,6 +46,7 @@ export function TransferForm({
       try {
         await action(formData);
       } catch (err) {
+        if (isRedirectError(err)) throw err;
         setError(err instanceof Error ? err.message : "Errore");
       }
     });

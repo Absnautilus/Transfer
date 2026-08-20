@@ -43,7 +43,7 @@ export function RequestRow({ request }: { request: Request }) {
         <div>
           <p className="font-semibold text-slate-900">{request.guestName}</p>
           <p className="text-sm text-slate-500">
-            {request.date} · {request.time} {request.isNightService && <span className="text-indigo-600">(notturno)</span>}
+            {request.date} · {request.time} {request.isNightService && <span className="text-purple-600">(notturno)</span>}
           </p>
         </div>
         <div className="flex gap-2">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { LinkButton } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { LogoMark } from "@/components/logo";
 
 // Lists hotels from the database — must read at request time, not be
 // baked into a static page at build time (new hotels wouldn't show up,
@@ -15,7 +16,8 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-16">
       <div className="w-full max-w-3xl text-center">
-        <p className="text-sm font-medium uppercase tracking-wide text-blue-600">Hotel Transfer</p>
+        <LogoMark className="mx-auto h-12 w-12" />
+        <p className="mt-3 text-sm font-medium uppercase tracking-wide text-purple-600">Hotel Transfer</p>
         <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
           Gestione automatizzata dei transfer organizzati dall&apos;hotel
         </h1>
@@ -43,7 +45,7 @@ export default async function Home() {
                       <Link
                         key={h.slug}
                         href={`/richiedi/${h.slug}`}
-                        className="block rounded-md border border-slate-200 px-3 py-2 text-sm text-blue-600 hover:bg-slate-50"
+                        className="block rounded-md border border-slate-200 px-3 py-2 text-sm text-purple-600 hover:bg-slate-50"
                       >
                         {h.name}
                       </Link>

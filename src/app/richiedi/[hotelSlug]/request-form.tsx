@@ -179,7 +179,7 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
               key={p}
               onClick={() => onPointChange(p)}
               className={`rounded-md border px-3 py-1.5 text-sm ${
-                p === selectedPoint ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 text-slate-700 hover:bg-slate-50"
+                p === selectedPoint ? "border-purple-600 bg-purple-600 text-white" : "border-slate-300 text-slate-700 hover:bg-slate-50"
               }`}
             >
               {p}
@@ -196,7 +196,7 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
                 <label
                   key={m.id}
                   className={`block cursor-pointer rounded-md border p-3 text-sm ${
-                    m.id === selectedRouteId ? "border-slate-900 ring-1 ring-slate-900" : "border-slate-200"
+                    m.id === selectedRouteId ? "border-purple-600 ring-1 ring-purple-600" : "border-slate-200"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
