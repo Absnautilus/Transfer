@@ -25,17 +25,20 @@ focalizzato sui transfer organizzati dall'hotel.
 
 ## Stack
 
-Next.js (App Router) + TypeScript + Tailwind CSS, Prisma ORM con SQLite (adapter
-`better-sqlite3`) come database, Auth.js (NextAuth v5) per l'accesso di hotel/taxi/autisti,
+Next.js (App Router) + TypeScript + Tailwind CSS, Prisma ORM con Postgres (adapter
+`@prisma/adapter-pg`) come database, Auth.js (NextAuth v5) per l'accesso di hotel/taxi/autisti,
 Nodemailer per le email (in sviluppo, senza SMTP configurato, le email vengono solo loggate
 in console e nella tabella `EmailLog`).
 
 ## Sviluppo
 
+Serve un database Postgres raggiungibile (locale, Docker, o uno gratuito su Neon/Vercel/Supabase
+— vedi sezione Deploy sotto per come crearne uno in 1 minuto).
+
 ```bash
 npm install
-cp .env.example .env      # genera AUTH_SECRET con: openssl rand -base64 32
-npm run db:migrate        # crea/aggiorna il database SQLite locale
+cp .env.example .env      # imposta DATABASE_URL e genera AUTH_SECRET con: openssl rand -base64 32
+npm run db:migrate        # crea/aggiorna lo schema sul database Postgres
 npm run db:seed           # dati demo (fittizi) + utenti di accesso
 npm run dev
 ```
@@ -57,14 +60,33 @@ npm run import:csv -- /percorso/assoluto/al/file.csv [hotel-slug]
 ```
 
 Lo script (`scripts/import-ncc-csv.ts`) non contiene dati reali: legge il percorso del CSV da
-riga di comando e scrive solo nel database locale (`dev.db`), che è escluso da git — nessun
-dato di ospiti reali viene mai committato. Vedi `.gitignore`.
+riga di comando e scrive solo nel database puntato da `DATABASE_URL` — usalo con un database
+locale/di sviluppo, mai con quello di produzione. Nessun dato reale di ospiti è mai committato
+(vedi `.gitignore`).
+
+## Deploy su Vercel
+
+1. Su [vercel.com](https://vercel.com) → **Add New → Project** → importa questo repo GitHub,
+   branch `claude/hotel-transfer-automation-app-bgrpzz` (o `main` dopo il merge).
+2. Nel progetto Vercel: **Storage → Create Database → Postgres** (Neon, incluso gratis) e
+   collegalo al progetto — questo imposta automaticamente `DATABASE_URL`.
+3. In **Settings → Environment Variables** aggiungi:
+   - `AUTH_SECRET` — genera con `openssl rand -base64 32`
+   - `APP_URL` — l'URL che Vercel assegna al progetto (es. `https://tuo-progetto.vercel.app`)
+4. In **Settings → Build & Development**, imposta il **Build Command** su:
+   `prisma migrate deploy && next build`
+   (crea le tabelle sul database ad ogni deploy).
+5. Fai il primo **Deploy**.
+6. Per popolare i dati demo la prima volta, da locale con `DATABASE_URL` puntato al database
+   Vercel/Neon appena creato (copialo da Storage → `.env.local` tab su Vercel):
+   `npm run db:seed`
+
+Da quel momento l'app è raggiungibile all'URL assegnato da Vercel, con gli accessi demo sopra.
 
 ## Note
 
 - I ruoli/stati (`Role`, `RequestStatus`, `TransferStatus`, ...) sono in
-  `src/lib/constants.ts`: SQLite non supporta enum nativi, quindi sono stringhe vincolate a
-  livello applicativo.
+  `src/lib/constants.ts`: sono stringhe vincolate a livello applicativo (non enum nativi del DB).
 - La protezione delle rotte `/hotel`, `/taxi`, `/driver` è centralizzata in `src/proxy.ts`.
 - Ancora da fare per una versione successiva: tracciamento GPS in tempo reale lato autista
   (oggi lo stato è a "tappe" tipo Uber, non su mappa), dashboard multi-hotel per una stessa
