@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Select, Textarea } from "@/components/ui/field";
+import { PhoneInput } from "@/components/phone-input";
 import { submitTransferRequest } from "./actions";
 
 type Route = { id: string; label: string };
@@ -64,10 +65,8 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
           <Input id="guestEmail" name="guestEmail" type="email" required />
         </FieldGroup>
         <FieldGroup>
-          <Label htmlFor="guestPhone" required>
-            Telefono (con prefisso internazionale)
-          </Label>
-          <Input id="guestPhone" name="guestPhone" placeholder="+39 333 1234567" required />
+          <Label required>Telefono</Label>
+          <PhoneInput name="guestPhone" required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="bookingNumber">Numero prenotazione</Label>
