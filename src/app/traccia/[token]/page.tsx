@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { TripStatusView } from "@/components/trip-status-view";
 import { AutoRefresh } from "@/components/auto-refresh";
+import { PublicHeader } from "@/components/public-header";
 
 export default async function GuestTrackingPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
@@ -13,9 +14,10 @@ export default async function GuestTrackingPage({ params }: { params: Promise<{ 
   if (!transfer) notFound();
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
+    <div className="min-h-screen bg-slate-50 pb-10">
       <AutoRefresh />
-      <div className="mx-auto max-w-md">
+      <PublicHeader />
+      <div className="mx-auto max-w-md px-4 pt-4">
         <p className="mb-4 text-center text-sm font-medium text-slate-500">{transfer.hotel.name}</p>
         <TripStatusView
           trip={{

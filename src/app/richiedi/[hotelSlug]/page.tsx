@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { PublicHeader } from "@/components/public-header";
 import { RequestForm } from "./request-form";
 
 export default async function GuestRequestPage({ params }: { params: Promise<{ hotelSlug: string }> }) {
@@ -13,8 +14,9 @@ export default async function GuestRequestPage({ params }: { params: Promise<{ h
   if (!hotel) notFound();
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-xl">
+    <div className="min-h-screen bg-slate-50 pb-10">
+      <PublicHeader />
+      <div className="mx-auto max-w-xl px-4 pt-4">
         <div className="mb-6 text-center">
           <p className="text-sm font-medium text-slate-500">{hotel.name}</p>
           <h1 className="text-2xl font-semibold text-slate-900">Richiesta transfer</h1>

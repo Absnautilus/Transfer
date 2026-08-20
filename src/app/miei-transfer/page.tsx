@@ -1,10 +1,12 @@
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { PublicHeader } from "@/components/public-header";
 import { LookupForm } from "./lookup-form";
 
 export default function MyTransfersPage() {
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10">
-      <div className="mx-auto max-w-xl">
+    <div className="min-h-screen bg-slate-50 pb-10">
+      <PublicHeader />
+      <div className="mx-auto max-w-xl px-4 pt-4">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-slate-900">I tuoi transfer</h1>
           <p className="mt-1 text-sm text-slate-500">

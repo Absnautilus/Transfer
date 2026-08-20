@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { cn } from "@/lib/cn";
+import { BackButton } from "@/components/back-button";
 
 export function DashboardShell({
   title,
@@ -18,8 +19,12 @@ export function DashboardShell({
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <div>
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
+          <BackButton />
+          <Link href="/" className="shrink-0 border-r border-slate-200 pr-3 text-sm font-semibold text-slate-900 hover:text-blue-600">
+            Hotel Transfer
+          </Link>
+          <div className="flex-1">
             <p className="text-xs uppercase tracking-wide text-slate-400">{title}</p>
             <p className="font-semibold text-slate-900">{orgName}</p>
           </div>
