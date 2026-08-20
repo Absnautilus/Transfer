@@ -2,8 +2,17 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { FieldError, FieldGroup, Input, Label } from "@/components/ui/field";
+import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
+import { PAX_BANDS } from "@/lib/pricing";
 import { createRoute } from "./actions";
+
+const PRICE_FIELDS = [
+  { key: "1_4", label: "1-4" },
+  { key: "5", label: "5" },
+  { key: "6", label: "6" },
+  { key: "7", label: "7" },
+  { key: "8", label: "8" },
+] as const;
 
 export function RouteForm() {
   const [error, setError] = useState<string | null>(null);
@@ -25,23 +34,66 @@ export function RouteForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className="flex flex-wrap items-end gap-3">
-      <FieldGroup className="mb-0 flex-1 min-w-[240px]">
-        <Label htmlFor="label" required>
-          Tratta
-        </Label>
-        <Input id="label" name="label" placeholder="es. SAN BASILIO >>> VCE" required />
-      </FieldGroup>
-      <FieldGroup className="mb-0 w-32">
-        <Label htmlFor="defaultPrice">Prezzo (€)</Label>
-        <Input id="defaultPrice" name="defaultPrice" type="number" step="0.01" />
-      </FieldGroup>
-      <Button type="submit" variant="secondary" disabled={pending} className="mb-4">
-        {pending ? "Aggiunta…" : "Aggiungi"}
-      </Button>
-      <div className="w-full">
-        <FieldError>{error ?? undefined}</FieldError>
+    <form ref={formRef} onSubmit={onSubmit}>
+      <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+        <FieldGroup>
+          <Label htmlFor="pointLabel" required>
+            Punto (aeroporto, stazione, ecc.)
+          </Label>
+          <Input id="pointLabel" name="pointLabel" placeholder="es. Aeroporto Marco Polo (VCE)" required />
+        </FieldGroup>
+        <FieldGroup>
+          <Label htmlFor="transferMode">Modalità di transfer (opzionale)</Label>
+          <Input id="transferMode" name="transferMode" placeholder="es. Auto privata + Taxi acqueo" />
+        </FieldGroup>
       </div>
+      <FieldGroup>
+        <Label htmlFor="description">Descrizione per l&apos;ospite</Label>
+        <Textarea id="description" name="description" rows={2} placeholder="Spiega come funziona questo transfer…" />
+      </FieldGroup>
+      <FieldGroup className="w-40">
+        <Label htmlFor="durationMinutes">Durata (minuti)</Label>
+        <Input id="durationMinutes" name="durationMinutes" type="number" min={0} />
+      </FieldGroup>
+
+      <div className="mt-2 overflow-x-auto rounded-md border border-slate-200">
+        <table className="w-full min-w-[480px] text-sm">
+          <thead className="bg-slate-50 text-xs uppercase text-slate-400">
+            <tr>
+              <th className="px-3 py-2 text-left">Prezzo (€)</th>
+              {PAX_BANDS.map((b) => (
+                <th key={b} className="px-3 py-2">
+                  {b} pax
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            <tr>
+              <td className="px-3 py-2 font-medium text-slate-700">Diurno</td>
+              {PRICE_FIELDS.map((f) => (
+                <td key={f.key} className="px-2 py-2">
+                  <Input name={`dayPrice${f.key}`} type="number" min={0} step="0.01" className="w-20" />
+                </td>
+              ))}
+            </tr>
+            <tr>
+              <td className="px-3 py-2 font-medium text-slate-700">Notturno</td>
+              {PRICE_FIELDS.map((f) => (
+                <td key={f.key} className="px-2 py-2">
+                  <Input name={`nightPrice${f.key}`} type="number" min={0} step="0.01" className="w-20" />
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <FieldError>{error ?? undefined}</FieldError>
+
+      <Button type="submit" variant="secondary" disabled={pending} className="mt-4">
+        {pending ? "Aggiunta…" : "Aggiungi tratta"}
+      </Button>
     </form>
   );
 }

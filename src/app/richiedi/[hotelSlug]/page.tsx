@@ -29,7 +29,18 @@ export default async function GuestRequestPage({ params }: { params: Promise<{ h
             <h2 className="text-sm font-semibold text-slate-700">Dettagli transfer</h2>
           </CardHeader>
           <CardBody>
-            <RequestForm hotelSlug={hotel.slug} hotelName={hotel.name} routes={hotel.routes.map((r) => ({ id: r.id, label: r.label }))} />
+            <RequestForm
+              hotelSlug={hotel.slug}
+              hotelName={hotel.name}
+              routes={hotel.routes.map((r) => ({
+                id: r.id,
+                pointLabel: r.pointLabel,
+                transferMode: r.transferMode,
+                description: r.description,
+                durationMinutes: r.durationMinutes,
+                priceTiers: r.priceTiers,
+              }))}
+            />
           </CardBody>
         </Card>
       </div>

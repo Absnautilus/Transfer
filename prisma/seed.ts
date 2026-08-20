@@ -40,19 +40,60 @@ async function main() {
   });
 
   const routeSeed = [
-    { label: "SAN BASILIO >>> VCE (Aeroporto Marco Polo)", defaultPrice: 95 },
-    { label: "VCE (Aeroporto Marco Polo) >>> SAN BASILIO", defaultPrice: 95 },
-    { label: "P.LE ROMA >>> HOTEL", defaultPrice: 60 },
-    { label: "SANTA LUCIA (Stazione) >>> HOTEL", defaultPrice: 65 },
-    { label: "DARSENA >>> HOTEL", defaultPrice: 235 },
-    { label: "TSF (Aeroporto Treviso) >>> SAN BASILIO", defaultPrice: 140 },
+    {
+      pointLabel: "Aeroporto Marco Polo (VCE)",
+      transferMode: "Auto privata",
+      description:
+        "Il suo autista la attenderà in arrivi dopo il ritiro bagagli e la accompagnerà con un'auto di lusso fino al terminal San Basilio, dove il nostro bellboy la aiuterà con i bagagli fino al check-in.",
+      durationMinutes: 20,
+      priceTiers: { day: { "1-4": 95, "5": 105, "6": 110, "7": 115, "8": 120 }, night: { "1-4": 105, "5": 115, "6": 120, "7": 125, "8": 130 } },
+    },
+    {
+      pointLabel: "Aeroporto Marco Polo (VCE)",
+      transferMode: "Auto privata + Taxi acqueo",
+      description:
+        "Il suo autista la attenderà in arrivi e la accompagnerà in auto fino a Piazzale Roma, dove un taxi acqueo privato la condurrà fino al pontile davanti all'hotel.",
+      durationMinutes: 35,
+      priceTiers: { day: { "1-4": 155, "5": 165, "6": 170, "7": 180, "8": 190 }, night: { "1-4": 165, "5": 175, "6": 180, "7": 190, "8": 200 } },
+    },
+    {
+      pointLabel: "Aeroporto Marco Polo (VCE)",
+      transferMode: "Taxi acqueo privato",
+      description:
+        "Il suo autista la attenderà in arrivi e la accompagnerà fino al gate acqueo dell'aeroporto, dove troverà il suo taxi acqueo privato per un'esclusiva navigazione nella laguna fino al pontile privato dell'hotel.",
+      durationMinutes: 40,
+      priceTiers: { day: { "1-4": 235, "5": 255, "6": 275, "7": 295, "8": 315 }, night: { "1-4": 245, "5": 265, "6": 285, "7": 305, "8": 325 } },
+    },
+    {
+      pointLabel: "Stazione Santa Lucia",
+      transferMode: null,
+      description: "Transfer privato in auto dalla stazione ferroviaria di Venezia Santa Lucia fino all'hotel.",
+      durationMinutes: 20,
+      priceTiers: { day: { "1-4": 160, "5": 170, "6": 175, "7": 180, "8": 185 }, night: { "1-4": 170, "5": 180, "6": 185, "7": 190, "8": 195 } },
+    },
   ];
   for (const [i, r] of routeSeed.entries()) {
-    const existing = await prisma.hotelRoute.findFirst({ where: { hotelId: hotel.id, label: r.label } });
+    const existing = await prisma.hotelRoute.findFirst({ where: { hotelId: hotel.id, pointLabel: r.pointLabel, transferMode: r.transferMode } });
     if (!existing) {
-      await prisma.hotelRoute.create({ data: { hotelId: hotel.id, label: r.label, defaultPrice: r.defaultPrice, sortOrder: i } });
+      await prisma.hotelRoute.create({
+        data: {
+          hotelId: hotel.id,
+          pointLabel: r.pointLabel,
+          transferMode: r.transferMode,
+          description: r.description,
+          durationMinutes: r.durationMinutes,
+          priceTiers: r.priceTiers,
+          sortOrder: i,
+        },
+      });
     }
   }
+  const seededRoutes = await prisma.hotelRoute.findMany({ where: { hotelId: hotel.id } });
+  const airportCarRoute = seededRoutes.find((r) => r.pointLabel === "Aeroporto Marco Polo (VCE)" && r.transferMode === "Auto privata")!;
+  const airportCarBoatRoute = seededRoutes.find(
+    (r) => r.pointLabel === "Aeroporto Marco Polo (VCE)" && r.transferMode === "Auto privata + Taxi acqueo",
+  )!;
+  const stationRoute = seededRoutes.find((r) => r.pointLabel === "Stazione Santa Lucia")!;
 
   await prisma.user.upsert({
     where: { email: "hotel@demo.local" },
@@ -120,10 +161,13 @@ async function main() {
           roomNumber: "204",
           bookingNumber: "BK-2041",
           pax: 2,
-          bags: "2 valigie",
+          bagsStandard: 2,
           date: today,
           time: "16:30",
-          routeLabel: "VCE (Aeroporto Marco Polo) >>> SAN BASILIO",
+          routeOptionId: airportCarRoute.id,
+          routeFrom: "Aeroporto Marco Polo (VCE)",
+          routeTo: hotel.name,
+          quotedPrice: 95,
           flightOrTrainNumber: "AF1234",
           flightOrTrainOrigin: "Parigi",
           notes: "Volo in leggero ritardo, confermeremo orario esatto.",
@@ -136,10 +180,14 @@ async function main() {
           roomNumber: "112",
           bookingNumber: "BK-2055",
           pax: 4,
-          bags: "4 valigie + 1 passeggino",
+          bagsStandard: 4,
+          bagsCabin: 1,
           date: format(addDays(new Date(), 1), "yyyy-MM-dd"),
           time: "09:15",
-          routeLabel: "SAN BASILIO >>> VCE (Aeroporto Marco Polo)",
+          routeOptionId: airportCarRoute.id,
+          routeFrom: hotel.name,
+          routeTo: "Aeroporto Marco Polo (VCE)",
+          quotedPrice: 95,
           flightOrTrainNumber: "BA562",
           flightOrTrainOrigin: "Londra",
         },
@@ -163,8 +211,9 @@ async function main() {
         bags: "2 valigie",
         date: today,
         time: "11:00",
-        routeFrom: "SAN BASILIO",
-        routeTo: "VCE (Aeroporto Marco Polo)",
+        routeOptionId: airportCarRoute.id,
+        routeFrom: hotel.name,
+        routeTo: "Aeroporto Marco Polo (VCE)",
         flightOrTrainNumber: "LO321",
         flightOrTrainOrigin: "Varsavia",
         price: 95,
@@ -185,11 +234,12 @@ async function main() {
         bags: "5 valigie",
         date: today,
         time: "14:45",
-        routeFrom: "VCE (Aeroporto Marco Polo)",
-        routeTo: "SAN BASILIO",
+        routeOptionId: airportCarBoatRoute.id,
+        routeFrom: "Aeroporto Marco Polo (VCE)",
+        routeTo: hotel.name,
         flightOrTrainNumber: "UA890",
         flightOrTrainOrigin: "Newark",
-        price: 155,
+        price: 165,
       },
     });
 
@@ -207,10 +257,11 @@ async function main() {
         pax: 1,
         date: today,
         time: "18:20",
-        routeFrom: "SANTA LUCIA (Stazione)",
-        routeTo: "HOTEL",
+        routeOptionId: stationRoute.id,
+        routeFrom: "Stazione Santa Lucia",
+        routeTo: hotel.name,
         flightOrTrainNumber: "ITALO 8906",
-        price: 65,
+        price: 160,
       },
     });
     await prisma.tripStatusEvent.create({ data: { transferId: t3.id, status: TRIP_EVENT.ASSIGNED, note: `Assegnato a ${drivers[0].name}` } });
@@ -229,8 +280,9 @@ async function main() {
         pax: 2,
         date: today,
         time: "07:30",
-        routeFrom: "SAN BASILIO",
-        routeTo: "VCE (Aeroporto Marco Polo)",
+        routeOptionId: airportCarRoute.id,
+        routeFrom: hotel.name,
+        routeTo: "Aeroporto Marco Polo (VCE)",
         price: 95,
         tripStartedAt: new Date(),
       },

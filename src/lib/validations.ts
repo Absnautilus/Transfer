@@ -1,28 +1,24 @@
 import { z } from "zod";
 
-export const guestRequestSchema = z
-  .object({
-    guestName: z.string().trim().min(2, "Inserisci nome e cognome"),
-    guestEmail: z.string().trim().email("Email non valida"),
-    guestPhone: z.string().trim().min(5, "Inserisci un numero di telefono valido"),
-    roomNumber: z.string().trim().optional(),
-    bookingNumber: z.string().trim().optional(),
-    pax: z.coerce.number().int().min(1, "Almeno 1 passeggero").max(50),
-    bags: z.string().trim().optional(),
-    date: z.string().min(1, "Seleziona una data"),
-    time: z.string().min(1, "Seleziona un orario"),
-    isNightService: z.coerce.boolean().optional().default(false),
-    routeLabel: z.string().trim().optional(),
-    routeFrom: z.string().trim().optional(),
-    routeTo: z.string().trim().optional(),
-    flightOrTrainNumber: z.string().trim().optional(),
-    flightOrTrainOrigin: z.string().trim().optional(),
-    notes: z.string().trim().optional(),
-  })
-  .refine((data) => data.routeLabel || (data.routeFrom && data.routeTo), {
-    message: "Seleziona una tratta oppure indica partenza e arrivo",
-    path: ["routeFrom"],
-  });
+export const guestRequestSchema = z.object({
+  guestName: z.string().trim().min(2, "Inserisci nome e cognome"),
+  guestEmail: z.string().trim().email("Email non valida"),
+  guestPhone: z.string().trim().min(5, "Inserisci un numero di telefono valido"),
+  roomNumber: z.string().trim().optional(),
+  bookingNumber: z.string().trim().optional(),
+  pax: z.coerce.number().int().min(1, "Almeno 1 passeggero").max(50),
+  bagsCabin: z.coerce.number().int().min(0).max(20).optional().default(0),
+  bagsStandard: z.coerce.number().int().min(0).max(20).optional().default(0),
+  bagsLarge: z.coerce.number().int().min(0).max(20).optional().default(0),
+  date: z.string().min(1, "Seleziona una data"),
+  time: z.string().min(1, "Seleziona un orario"),
+  isNightService: z.coerce.boolean().optional().default(false),
+  routeOptionId: z.string().trim().min(1, "Seleziona punto e modalità di transfer"),
+  direction: z.enum(["ARRIVO", "PARTENZA"], { message: "Seleziona la direzione del transfer" }),
+  flightOrTrainNumber: z.string().trim().optional(),
+  flightOrTrainOrigin: z.string().trim().optional(),
+  notes: z.string().trim().optional(),
+});
 
 export type GuestRequestInput = z.infer<typeof guestRequestSchema>;
 

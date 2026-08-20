@@ -6,6 +6,7 @@ import { requireHotelUser } from "@/lib/session";
 import { REQUEST_STATUS, TRANSFER_STATUS } from "@/lib/constants";
 import { rejectRequestSchema } from "@/lib/validations";
 import { sendRequestAcceptedEmail, sendRequestRejectedEmail } from "@/lib/emails";
+import { formatBags } from "@/lib/bags";
 
 export async function acceptRequest(requestId: string) {
   const user = await requireHotelUser();
@@ -34,12 +35,14 @@ export async function acceptRequest(requestId: string) {
         roomNumber: request.roomNumber,
         bookingNumber: request.bookingNumber,
         pax: request.pax,
-        bags: request.bags,
+        bags: formatBags(request.bagsCabin, request.bagsStandard, request.bagsLarge),
         date: request.date,
         time: request.time,
         isNightService: request.isNightService,
-        routeFrom: request.routeLabel ? request.routeLabel.split(">>>")[0]?.trim() ?? request.routeLabel : request.routeFrom ?? "",
-        routeTo: request.routeLabel ? request.routeLabel.split(">>>")[1]?.trim() ?? "" : request.routeTo ?? "",
+        routeOptionId: request.routeOptionId,
+        routeFrom: request.routeFrom,
+        routeTo: request.routeTo,
+        price: request.quotedPrice,
         flightOrTrainNumber: request.flightOrTrainNumber,
         flightOrTrainOrigin: request.flightOrTrainOrigin,
         notes: request.notes,

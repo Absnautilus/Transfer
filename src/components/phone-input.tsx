@@ -19,11 +19,11 @@ export function PhoneInput({
   const [number, setNumber] = useState(defaultNumber);
 
   return (
-    <div className="flex gap-2">
-      <Select value={prefix} onChange={(e) => setPrefix(e.target.value)} className="w-40 shrink-0">
+    <div className="flex min-w-0 gap-2">
+      <Select value={prefix} onChange={(e) => setPrefix(e.target.value)} className="w-28 shrink-0">
         {PHONE_PREFIXES.map((p) => (
-          <option key={p.code} value={p.code}>
-            {p.code} {p.country}
+          <option key={p.code} value={p.code} title={p.country}>
+            {p.flag} {p.code}
           </option>
         ))}
       </Select>
@@ -34,7 +34,7 @@ export function PhoneInput({
         value={number}
         onChange={(e) => setNumber(e.target.value)}
         required={required}
-        className="flex-1"
+        className="min-w-0 flex-1"
       />
       <input type="hidden" name={name} value={number.trim() ? `${prefix} ${number.trim()}` : ""} />
     </div>

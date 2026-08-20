@@ -47,14 +47,28 @@ model TaxiCompany {
   hotelsUsingAsPrimary Hotel[]
 }
 
+// One row = one way to reach a given point from the hotel (or vice versa).
+// A point (e.g. "Aeroporto Marco Polo") can have several rows, one per
+// transferMode, each with its own description/duration/price — e.g. private
+// water taxi vs. car vs. car + water taxi for the same airport.
+//
+// priceTiers shape: { "day": { "1-4": 95, "5": 105, "6": 110, "7": 115, "8": 120 },
+//                      "night": { "1-4": 105, "5": 115, "6": 120, "7": 125, "8": 130 } }
+// Pax counts above the highest band use that band's price.
 model HotelRoute {
-  id           String  @id @default(cuid())
-  hotelId      String
-  hotel        Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  label        String // e.g. "SAN BASILIO >>> VCE"
-  defaultPrice Float?
-  active       Boolean @default(true)
-  sortOrder    Int     @default(0)
+  id              String  @id @default(cuid())
+  hotelId         String
+  hotel           Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  pointLabel      String // e.g. "Aeroporto Marco Polo (VCE)"
+  transferMode    String? // e.g. "Auto privata" — null when the point has only one mode
+  description     String? // shown to the guest to help them choose a mode
+  durationMinutes Int?
+  priceTiers      Json // see comment above
+  active          Boolean @default(true)
+  sortOrder       Int     @default(0)
+
+  requests  TransferRequest[]
+  transfers Transfer[]
 
   @@index([hotelId])
 }
@@ -122,13 +136,17 @@ model TransferRequest {
   roomNumber     String?
   bookingNumber  String?
   pax            Int
-  bags           String?
+  bagsCabin      Int     @default(0)
+  bagsStandard   Int     @default(0)
+  bagsLarge      Int     @default(0)
   date           String // YYYY-MM-DD
   time           String // HH:mm
   isNightService Boolean @default(false)
-  routeLabel     String? // chosen standard route
-  routeFrom      String? // used when routeLabel is empty (custom route)
-  routeTo        String?
+  routeOptionId  String?
+  routeOption    HotelRoute? @relation(fields: [routeOptionId], references: [id], onDelete: SetNull)
+  routeFrom      String
+  routeTo        String
+  quotedPrice    Float?
   flightOrTrainNumber String?
   flightOrTrainOrigin String?
   notes          String?
@@ -175,6 +193,8 @@ model Transfer {
   date           String // YYYY-MM-DD
   time           String // HH:mm
   isNightService Boolean @default(false)
+  routeOptionId  String?
+  routeOption    HotelRoute? @relation(fields: [routeOptionId], references: [id], onDelete: SetNull)
   routeFrom      String
   routeTo        String
   flightOrTrainNumber String?

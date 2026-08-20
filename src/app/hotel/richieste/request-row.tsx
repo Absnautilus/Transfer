@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { acceptRequest, rejectRequest } from "./actions";
+import { formatBags } from "@/lib/bags";
 
 type Request = {
   id: string;
@@ -13,13 +14,15 @@ type Request = {
   roomNumber: string | null;
   bookingNumber: string | null;
   pax: number;
-  bags: string | null;
+  bagsCabin: number;
+  bagsStandard: number;
+  bagsLarge: number;
   date: string;
   time: string;
   isNightService: boolean;
-  routeLabel: string | null;
-  routeFrom: string | null;
-  routeTo: string | null;
+  routeFrom: string;
+  routeTo: string;
+  quotedPrice: number | null;
   flightOrTrainNumber: string | null;
   flightOrTrainOrigin: string | null;
   notes: string | null;
@@ -31,7 +34,8 @@ export function RequestRow({ request }: { request: Request }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const route = request.routeLabel ?? `${request.routeFrom ?? "?"} → ${request.routeTo ?? "?"}`;
+  const route = `${request.routeFrom} → ${request.routeTo}`;
+  const bags = formatBags(request.bagsCabin, request.bagsStandard, request.bagsLarge);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -74,9 +78,15 @@ export function RequestRow({ request }: { request: Request }) {
         <div>
           <dt className="text-slate-400">Pax / Bagagli</dt>
           <dd>
-            {request.pax} pax {request.bags && `· ${request.bags}`}
+            {request.pax} pax {bags && `· ${bags}`}
           </dd>
         </div>
+        {request.quotedPrice != null && (
+          <div>
+            <dt className="text-slate-400">Tariffa indicativa</dt>
+            <dd>€ {request.quotedPrice.toFixed(2)}</dd>
+          </div>
+        )}
         <div>
           <dt className="text-slate-400">Camera / Prenotazione</dt>
           <dd>
