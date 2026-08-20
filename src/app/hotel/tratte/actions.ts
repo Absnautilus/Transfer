@@ -8,10 +8,14 @@ import type { PriceTiers } from "@/lib/pricing";
 
 const priceField = z.coerce.number().min(0).optional().default(0);
 
+const POINT_CATEGORIES = ["AEROPORTO", "STAZIONE", "PORTO", "ALTRO"] as const;
+
 const createRouteSchema = z.object({
   pointLabel: z.string().trim().min(2, "Indica il punto, es. Aeroporto Marco Polo (VCE)"),
+  pointCategory: z.enum(POINT_CATEGORIES).optional().default("ALTRO"),
   transferMode: z.string().trim().optional(),
-  description: z.string().trim().optional(),
+  descriptionArrival: z.string().trim().optional(),
+  descriptionDeparture: z.string().trim().optional(),
   durationMinutes: z.coerce.number().int().min(0).optional(),
   dayPrice1_4: priceField,
   dayPrice5: priceField,
@@ -54,8 +58,10 @@ export async function createRoute(formData: FormData) {
     data: {
       hotelId: user.hotelId,
       pointLabel: parsed.data.pointLabel,
+      pointCategory: parsed.data.pointCategory,
       transferMode: parsed.data.transferMode || null,
-      description: parsed.data.description || null,
+      descriptionArrival: parsed.data.descriptionArrival ? { it: parsed.data.descriptionArrival } : undefined,
+      descriptionDeparture: parsed.data.descriptionDeparture ? { it: parsed.data.descriptionDeparture } : undefined,
       durationMinutes: parsed.data.durationMinutes ?? null,
       priceTiers: buildPriceTiers(parsed.data),
       sortOrder: count,

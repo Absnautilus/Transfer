@@ -14,7 +14,22 @@ export type TripInfo = {
   events: { status: string; createdAt: string }[];
 };
 
-export function TripStatusView({ trip, children }: { trip: TripInfo; children?: React.ReactNode }) {
+export function TripStatusView({
+  trip,
+  children,
+  labels,
+  driverNotAssigned = "Autista non ancora assegnato.",
+  driverLabel = "Autista:",
+  locale = "it-IT",
+}: {
+  trip: TripInfo;
+  children?: React.ReactNode;
+  labels?: Record<TripEvent, string>;
+  driverNotAssigned?: string;
+  driverLabel?: string;
+  locale?: string;
+}) {
+  const stepLabels = labels ?? TRIP_EVENT_LABEL;
   const reachedStatuses = new Set(trip.events.map((e) => e.status));
   const lastEvent = trip.events[trip.events.length - 1];
 
@@ -23,7 +38,7 @@ export function TripStatusView({ trip, children }: { trip: TripInfo; children?: 
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="mb-1 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">{trip.guestName}</h2>
-          {lastEvent && <Badge>{TRIP_EVENT_LABEL[lastEvent.status as TripEvent] ?? lastEvent.status}</Badge>}
+          {lastEvent && <Badge>{stepLabels[lastEvent.status as TripEvent] ?? lastEvent.status}</Badge>}
         </div>
         <p className="text-sm text-slate-500">
           {trip.date} · {trip.time}
@@ -35,11 +50,11 @@ export function TripStatusView({ trip, children }: { trip: TripInfo; children?: 
         <div className="mt-4 rounded-md bg-slate-50 p-3 text-sm">
           {trip.driverName ? (
             <p>
-              Autista: <span className="font-medium text-slate-900">{trip.driverName}</span>
+              {driverLabel} <span className="font-medium text-slate-900">{trip.driverName}</span>
               {trip.driverPhone && <span className="text-slate-500"> · {trip.driverPhone}</span>}
             </p>
           ) : (
-            <p className="text-slate-500">Autista non ancora assegnato.</p>
+            <p className="text-slate-500">{driverNotAssigned}</p>
           )}
         </div>
 
@@ -57,8 +72,8 @@ export function TripStatusView({ trip, children }: { trip: TripInfo; children?: 
                   {reached ? "✓" : ""}
                 </span>
                 <div>
-                  <p className={reached ? "font-medium text-slate-900" : "text-slate-400"}>{TRIP_EVENT_LABEL[step]}</p>
-                  {event && <p className="text-xs text-slate-400">{new Date(event.createdAt).toLocaleTimeString("it-IT")}</p>}
+                  <p className={reached ? "font-medium text-slate-900" : "text-slate-400"}>{stepLabels[step]}</p>
+                  {event && <p className="text-xs text-slate-400">{new Date(event.createdAt).toLocaleTimeString(locale)}</p>}
                 </div>
               </li>
             );

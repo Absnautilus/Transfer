@@ -34,6 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           hotelId: user.hotelId,
           taxiCompanyId: user.taxiCompanyId,
           driverId: user.driverId,
+          isOrgAdmin: user.isOrgAdmin,
         };
       },
     }),
@@ -45,6 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.hotelId = user.hotelId as string | null;
         token.taxiCompanyId = user.taxiCompanyId as string | null;
         token.driverId = user.driverId as string | null;
+        token.isOrgAdmin = Boolean((user as { isOrgAdmin?: boolean }).isOrgAdmin);
       }
       return token;
     },
@@ -55,6 +57,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.hotelId = token.hotelId as string | null;
         session.user.taxiCompanyId = token.taxiCompanyId as string | null;
         session.user.driverId = token.driverId as string | null;
+        session.user.isOrgAdmin = Boolean(token.isOrgAdmin);
       }
       return session;
     },

@@ -15,9 +15,12 @@ export const guestRequestSchema = z.object({
   isNightService: z.coerce.boolean().optional().default(false),
   routeOptionId: z.string().trim().min(1, "Seleziona punto e modalità di transfer"),
   direction: z.enum(["ARRIVO", "PARTENZA"], { message: "Seleziona la direzione del transfer" }),
+  arrivalMode: z.enum(["AEREO", "TRENO", "NAVE", "AUTO", "AUTOBUS"]).optional(),
+  estimatedArrivalTime: z.string().trim().optional(),
   flightOrTrainNumber: z.string().trim().optional(),
   flightOrTrainOrigin: z.string().trim().optional(),
   notes: z.string().trim().optional(),
+  locale: z.enum(["it", "en", "es", "pt", "fr", "de"]).optional().default("it"),
 });
 
 export type GuestRequestInput = z.infer<typeof guestRequestSchema>;

@@ -21,7 +21,17 @@ focalizzato sui transfer organizzati dall'hotel.
    all'ultimo minuto) un autista.
 5. L'**autista** vede i propri transfer (`/driver`) e aggiorna lo stato del viaggio (in arrivo,
    arrivato, iniziato, completato); l'**ospite** vede lo stesso stato in tempo reale sulla pagina
-   pubblica di tracciamento `/traccia/<token>`.
+   pubblica di tracciamento `/traccia/<token>`, e lo stesso stato è visibile anche all'operatore
+   hotel nella tabella Transfer confermati.
+
+Il questionario ospite, la pagina di tracciamento e "I tuoi transfer" sono disponibili in 6 lingue
+(italiano, inglese, spagnolo, portoghese, francese, tedesco) tramite il selettore in alto a destra;
+le dashboard operative restano in italiano. Un amministratore per hotel/compagnia taxi
+(`isOrgAdmin`, gestibile in `/hotel/team` o `/taxi/team`) può promuovere altri operatori o autisti
+ad amministratore, vede la sezione Contabilità (provvigioni calcolate su `TaxiCompany.commissionRate`)
+e può scaricare un backup JSON completo dei dati da lì. Le notifiche in-app (campanella in
+dashboard) avvisano su nuove richieste, conferme/rifiuti taxi e annullamenti. Ogni transfer può
+essere annullato indicando motivo e penale (nessuna/totale/parziale con importo).
 
 ## Stack
 
@@ -108,12 +118,29 @@ In locale, se usi Supabase, aggiungi entrambe le variabili anche al tuo `.env` (
 
 Da quel momento l'app è raggiungibile all'URL assegnato da Vercel, con gli accessi demo sopra.
 
+## Backup
+
+`GET /api/admin/backup` (protetto, solo amministratori) e `npm run db:backup` (standalone,
+scrive in `backups/`, mai committata) esportano un JSON completo di hotel/tratte/richieste/
+transfer/utenti (senza password). Supabase esegue comunque backup automatici del database a
+livello infrastrutturale — questi export sono un livello aggiuntivo, scaricabile in autonomia
+dall'operatore in qualsiasi momento.
+
 ## Note
 
 - I ruoli/stati (`Role`, `RequestStatus`, `TransferStatus`, ...) sono in
   `src/lib/constants.ts`: sono stringhe vincolate a livello applicativo (non enum nativi del DB).
 - La protezione delle rotte `/hotel`, `/taxi`, `/driver` è centralizzata in `src/proxy.ts`.
-- Ancora da fare per una versione successiva: tracciamento GPS in tempo reale lato autista
-  (oggi lo stato è a "tappe" tipo Uber, non su mappa), dashboard multi-hotel per una stessa
-  compagnia taxi, e le altre due dashboard del prodotto (ospite self-service, agenzia/
-  intermediario).
+- `User.permissions` (Json) esiste in schema per permessi granulari futuri, ma oggi l'unico
+  controllo attivo è binario (`isOrgAdmin`) — comodo punto di estensione senza nuova migrazione.
+- Le tratte (`HotelRoute`) hanno `pointCategory` (aeroporto/stazione/porto/altro) e descrizioni
+  separate per arrivo/partenza, ciascuna un Json multilingua `{ it, en, es, pt, fr, de }`
+  (fallback automatico all'italiano); l'admin hotel oggi compila solo il testo italiano da
+  `/hotel/tratte`, le altre lingue vanno aggiunte a mano nel campo Json finché non c'è un editor
+  multilingua dedicato.
+- Ancora da fare per una versione successiva: editor multilingua per le descrizioni delle tratte,
+  permessi granulari (oltre al semplice admin/non-admin), creazione di nuovi accessi
+  staff/autista da UI per organizzazioni diverse dal seed, backup automatico schedulato (oggi è
+  su richiesta), tracciamento GPS in tempo reale lato autista (oggi lo stato è a "tappe" tipo
+  Uber, non su mappa), dashboard multi-hotel per una stessa compagnia taxi, e la terza dashboard
+  del prodotto (agenzia/intermediario).

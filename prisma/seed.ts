@@ -23,6 +23,7 @@ async function main() {
       name: "Venezia Transfer NCC",
       email: "operativo@veneziatransfer.demo",
       phone: "+39 041 000000",
+      commissionRate: 15,
     },
   });
 
@@ -42,32 +43,41 @@ async function main() {
   const routeSeed = [
     {
       pointLabel: "Aeroporto Marco Polo (VCE)",
+      pointCategory: "AEROPORTO",
       transferMode: "Auto privata",
-      description:
+      descriptionArrival:
         "Il suo autista la attenderà in arrivi dopo il ritiro bagagli e la accompagnerà con un'auto di lusso fino al terminal San Basilio, dove il nostro bellboy la aiuterà con i bagagli fino al check-in.",
+      descriptionDeparture: "Il suo autista la attenderà nella hall dell'hotel e la accompagnerà con un'auto di lusso fino all'aeroporto.",
       durationMinutes: 20,
       priceTiers: { day: { "1-4": 95, "5": 105, "6": 110, "7": 115, "8": 120 }, night: { "1-4": 105, "5": 115, "6": 120, "7": 125, "8": 130 } },
     },
     {
       pointLabel: "Aeroporto Marco Polo (VCE)",
+      pointCategory: "AEROPORTO",
       transferMode: "Auto privata + Taxi acqueo",
-      description:
+      descriptionArrival:
         "Il suo autista la attenderà in arrivi e la accompagnerà in auto fino a Piazzale Roma, dove un taxi acqueo privato la condurrà fino al pontile davanti all'hotel.",
+      descriptionDeparture:
+        "Un taxi acqueo privato la preleverà dal pontile dell'hotel fino a Piazzale Roma, dove il suo autista la accompagnerà in auto fino all'aeroporto.",
       durationMinutes: 35,
       priceTiers: { day: { "1-4": 155, "5": 165, "6": 170, "7": 180, "8": 190 }, night: { "1-4": 165, "5": 175, "6": 180, "7": 190, "8": 200 } },
     },
     {
       pointLabel: "Aeroporto Marco Polo (VCE)",
+      pointCategory: "AEROPORTO",
       transferMode: "Taxi acqueo privato",
-      description:
+      descriptionArrival:
         "Il suo autista la attenderà in arrivi e la accompagnerà fino al gate acqueo dell'aeroporto, dove troverà il suo taxi acqueo privato per un'esclusiva navigazione nella laguna fino al pontile privato dell'hotel.",
+      descriptionDeparture: "Un taxi acqueo privato la preleverà dal pontile dell'hotel per un'esclusiva navigazione nella laguna fino al gate acqueo dell'aeroporto.",
       durationMinutes: 40,
       priceTiers: { day: { "1-4": 235, "5": 255, "6": 275, "7": 295, "8": 315 }, night: { "1-4": 245, "5": 265, "6": 285, "7": 305, "8": 325 } },
     },
     {
       pointLabel: "Stazione Santa Lucia",
+      pointCategory: "STAZIONE",
       transferMode: null,
-      description: "Transfer privato in auto dalla stazione ferroviaria di Venezia Santa Lucia fino all'hotel.",
+      descriptionArrival: "Il suo autista la attenderà in stazione e la accompagnerà in auto fino all'hotel.",
+      descriptionDeparture: "Il suo autista la attenderà nella hall dell'hotel e la accompagnerà in auto fino alla stazione.",
       durationMinutes: 20,
       priceTiers: { day: { "1-4": 160, "5": 170, "6": 175, "7": 180, "8": 185 }, night: { "1-4": 170, "5": 180, "6": 185, "7": 190, "8": 195 } },
     },
@@ -79,8 +89,10 @@ async function main() {
         data: {
           hotelId: hotel.id,
           pointLabel: r.pointLabel,
+          pointCategory: r.pointCategory,
           transferMode: r.transferMode,
-          description: r.description,
+          descriptionArrival: { it: r.descriptionArrival },
+          descriptionDeparture: { it: r.descriptionDeparture },
           durationMinutes: r.durationMinutes,
           priceTiers: r.priceTiers,
           sortOrder: i,
@@ -104,6 +116,7 @@ async function main() {
       name: "Reception Palazzo Veneziano",
       role: ROLES.HOTEL_STAFF,
       hotelId: hotel.id,
+      isOrgAdmin: true,
     },
   });
 
@@ -116,6 +129,7 @@ async function main() {
       name: "Centrale Venezia Transfer",
       role: ROLES.TAXI_STAFF,
       taxiCompanyId: taxiCompany.id,
+      isOrgAdmin: true,
     },
   });
 

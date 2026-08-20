@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireHotelUser } from "@/lib/session";
 import { TRANSFER_STATUS } from "@/lib/constants";
 import { manualTransferSchema } from "@/lib/validations";
+import { notifyTaxiStaff } from "@/lib/notifications";
 
 export async function createManualTransfer(formData: FormData) {
   const user = await requireHotelUser();
@@ -85,15 +86,39 @@ export async function updateTransfer(formData: FormData) {
   redirect(`/hotel/transfer?date=${data.date}`);
 }
 
-export async function cancelTransfer(transferId: string) {
+export async function cancelTransfer(formData: FormData) {
   const user = await requireHotelUser();
+  const transferId = String(formData.get("transferId") ?? "");
+  const cancellationReason = String(formData.get("cancellationReason") ?? "").trim();
+  const penaltyTypeRaw = String(formData.get("penaltyType") ?? "NONE");
+  const penaltyType = ["NONE", "FULL", "PARTIAL"].includes(penaltyTypeRaw) ? penaltyTypeRaw : "NONE";
+  const penaltyAmountRaw = formData.get("penaltyAmount");
+  const penaltyAmount = penaltyType === "PARTIAL" && penaltyAmountRaw ? Number(penaltyAmountRaw) : null;
+
   const existing = await prisma.transfer.findFirst({ where: { id: transferId, hotelId: user.hotelId } });
   if (!existing) throw new Error("Transfer non trovato.");
 
   await prisma.transfer.update({
     where: { id: existing.id },
-    data: { status: TRANSFER_STATUS.CANCELLED, updatedByUserId: user.id },
+    data: {
+      status: TRANSFER_STATUS.CANCELLED,
+      updatedByUserId: user.id,
+      cancelledAt: new Date(),
+      cancelledByUserId: user.id,
+      cancellationReason: cancellationReason || null,
+      penaltyType,
+      penaltyAmount,
+    },
   });
+
+  if (existing.taxiCompanyId) {
+    await notifyTaxiStaff(existing.taxiCompanyId, {
+      type: "TRANSFER_CANCELLED",
+      title: "Transfer annullato dall'hotel",
+      body: `${existing.guestName} — ${existing.date} ${existing.time}`,
+      link: "/taxi/transfer",
+    });
+  }
 
   revalidatePath("/hotel/transfer");
   revalidatePath("/taxi/transfer");

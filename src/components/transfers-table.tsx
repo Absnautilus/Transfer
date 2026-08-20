@@ -1,6 +1,7 @@
 import { StatusBadge } from "@/components/ui/badge";
 import { TaxiRowActions } from "@/components/taxi-row-actions";
 import { HotelRowActions } from "@/components/hotel-row-actions";
+import { TRIP_EVENT_LABEL, type TripEvent } from "@/lib/constants";
 
 type Transfer = {
   id: string;
@@ -19,7 +20,13 @@ type Transfer = {
   status: string;
   driverId: string | null;
   driver: { id: string; name: string } | null;
+  statusEvents?: { status: string; createdAt: Date | string }[];
+  cancellationReason?: string | null;
+  penaltyType?: string | null;
+  penaltyAmount?: number | null;
 };
+
+const PENALTY_LABEL: Record<string, string> = { NONE: "Senza penale", FULL: "Penale totale", PARTIAL: "Penale parziale" };
 
 type Driver = { id: string; name: string; active: boolean };
 
@@ -82,6 +89,17 @@ export function TransfersTable({
               </td>
               <td className="px-3 py-3">
                 <StatusBadge status={t.status} />
+                {t.statusEvents?.[0] && t.status !== "CANCELLED" && (
+                  <div className="mt-1 text-xs text-slate-400">
+                    {TRIP_EVENT_LABEL[t.statusEvents[0].status as TripEvent] ?? t.statusEvents[0].status}
+                  </div>
+                )}
+                {t.status === "CANCELLED" && t.penaltyType && (
+                  <div className="mt-1 text-xs text-slate-400">
+                    {PENALTY_LABEL[t.penaltyType] ?? t.penaltyType}
+                    {t.penaltyType === "PARTIAL" && t.penaltyAmount != null && ` (€ ${t.penaltyAmount.toFixed(2)})`}
+                  </div>
+                )}
               </td>
               <td className="px-3 py-3 text-slate-600">
                 {scope === "hotel" ? t.driver?.name ?? "—" : null}

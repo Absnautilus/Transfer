@@ -7,13 +7,14 @@ import { REQUEST_STATUS, TRANSFER_STATUS } from "@/lib/constants";
 import { rejectRequestSchema } from "@/lib/validations";
 import { sendRequestAcceptedEmail, sendRequestRejectedEmail } from "@/lib/emails";
 import { formatBags } from "@/lib/bags";
+import { notifyTaxiStaff } from "@/lib/notifications";
 
 export async function acceptRequest(requestId: string) {
   const user = await requireHotelUser();
 
   const request = await prisma.transferRequest.findFirst({
     where: { id: requestId, hotelId: user.hotelId, status: REQUEST_STATUS.PENDING },
-    include: { hotel: true },
+    include: { hotel: { include: { primaryTaxiCompany: true } } },
   });
   if (!request) throw new Error("Richiesta non trovata.");
 
@@ -43,13 +44,26 @@ export async function acceptRequest(requestId: string) {
         routeFrom: request.routeFrom,
         routeTo: request.routeTo,
         price: request.quotedPrice,
+        arrivalMode: request.arrivalMode,
+        estimatedArrivalTime: request.estimatedArrivalTime,
         flightOrTrainNumber: request.flightOrTrainNumber,
         flightOrTrainOrigin: request.flightOrTrainOrigin,
         notes: request.notes,
+        locale: request.locale,
+        commissionRateSnapshot: request.hotel.primaryTaxiCompany?.commissionRate ?? null,
         createdByUserId: user.id,
       },
     });
   });
+
+  if (request.hotel.primaryTaxiCompanyId) {
+    await notifyTaxiStaff(request.hotel.primaryTaxiCompanyId, {
+      type: "TRANSFER_NEW",
+      title: "Nuovo transfer da confermare",
+      body: `${transfer.guestName} — ${transfer.date} ${transfer.time}`,
+      link: "/taxi/transfer",
+    });
+  }
 
   await sendRequestAcceptedEmail({
     guestEmail: request.guestEmail,

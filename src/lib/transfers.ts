@@ -21,7 +21,7 @@ export async function getTransfers(scope: { hotelId?: string; taxiCompanyId?: st
 
   return prisma.transfer.findMany({
     where,
-    include: { driver: true },
+    include: { driver: true, statusEvents: { orderBy: { createdAt: "desc" }, take: 1 } },
     orderBy: [{ date: "asc" }, { time: "asc" }],
   });
 }

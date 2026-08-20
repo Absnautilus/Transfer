@@ -11,6 +11,7 @@ export function RouteRow({
   route: {
     id: string;
     pointLabel: string;
+    pointCategory: string;
     transferMode: string | null;
     durationMinutes: number | null;
     priceTiers: unknown;
@@ -25,7 +26,10 @@ export function RouteRow({
     <tr>
       <td className="px-4 py-2 font-medium text-slate-900">
         {route.pointLabel}
-        {route.transferMode && <div className="text-xs font-normal text-slate-500">{route.transferMode}</div>}
+        <div className="text-xs font-normal text-slate-500">
+          {route.pointCategory}
+          {route.transferMode && ` · ${route.transferMode}`}
+        </div>
       </td>
       <td className="px-4 py-2 text-slate-600">{route.durationMinutes ? `${route.durationMinutes} min` : "—"}</td>
       <td className="px-4 py-2 text-slate-600">{typeof dayFrom4 === "number" ? `da € ${dayFrom4.toFixed(2)}` : "—"}</td>

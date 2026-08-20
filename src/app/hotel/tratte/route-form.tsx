@@ -2,9 +2,16 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
+import { FieldError, FieldGroup, Input, Label, Select, Textarea } from "@/components/ui/field";
 import { PAX_BANDS } from "@/lib/pricing";
 import { createRoute } from "./actions";
+
+const POINT_CATEGORIES = [
+  { value: "AEROPORTO", label: "Aeroporto" },
+  { value: "STAZIONE", label: "Stazione" },
+  { value: "PORTO", label: "Porto" },
+  { value: "ALTRO", label: "Altro" },
+] as const;
 
 const PRICE_FIELDS = [
   { key: "1_4", label: "1-4" },
@@ -38,19 +45,35 @@ export function RouteForm() {
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
         <FieldGroup>
           <Label htmlFor="pointLabel" required>
-            Punto (aeroporto, stazione, ecc.)
+            Punto (aeroporto, stazione, porto, ecc.)
           </Label>
           <Input id="pointLabel" name="pointLabel" placeholder="es. Aeroporto Marco Polo (VCE)" required />
         </FieldGroup>
         <FieldGroup>
-          <Label htmlFor="transferMode">Modalità di transfer (opzionale)</Label>
-          <Input id="transferMode" name="transferMode" placeholder="es. Auto privata + Taxi acqueo" />
+          <Label htmlFor="pointCategory">Categoria</Label>
+          <Select id="pointCategory" name="pointCategory" defaultValue="ALTRO">
+            {POINT_CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </Select>
         </FieldGroup>
       </div>
       <FieldGroup>
-        <Label htmlFor="description">Descrizione per l&apos;ospite</Label>
-        <Textarea id="description" name="description" rows={2} placeholder="Spiega come funziona questo transfer…" />
+        <Label htmlFor="transferMode">Modalità di transfer (opzionale)</Label>
+        <Input id="transferMode" name="transferMode" placeholder="es. Auto privata + Taxi acqueo" />
       </FieldGroup>
+      <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+        <FieldGroup>
+          <Label htmlFor="descriptionArrival">Descrizione per l&apos;ospite in arrivo</Label>
+          <Textarea id="descriptionArrival" name="descriptionArrival" rows={2} placeholder="es. Attendiamo in area arrivi con cartello nominativo…" />
+        </FieldGroup>
+        <FieldGroup>
+          <Label htmlFor="descriptionDeparture">Descrizione per l&apos;ospite in partenza</Label>
+          <Textarea id="descriptionDeparture" name="descriptionDeparture" rows={2} placeholder="es. Ritiro dalla hall dell'hotel…" />
+        </FieldGroup>
+      </div>
       <FieldGroup className="w-40">
         <Label htmlFor="durationMinutes">Durata (minuti)</Label>
         <Input id="durationMinutes" name="durationMinutes" type="number" min={0} />

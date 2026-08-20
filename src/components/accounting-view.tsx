@@ -1,0 +1,94 @@
+type Row = {
+  id: string;
+  date: string;
+  guestName: string;
+  price: number | null;
+  commissionRateSnapshot: number | null;
+};
+
+function computeRow(r: Row) {
+  const commission = r.price != null && r.commissionRateSnapshot != null ? (r.price * r.commissionRateSnapshot) / 100 : null;
+  const net = r.price != null && commission != null ? r.price - commission : null;
+  return { commission, net };
+}
+
+export function AccountingView({ rows, from, to }: { rows: Row[]; from: string; to: string }) {
+  const totals = rows.reduce(
+    (acc, r) => {
+      const { commission, net } = computeRow(r);
+      acc.price += r.price ?? 0;
+      acc.commission += commission ?? 0;
+      acc.net += net ?? 0;
+      return acc;
+    },
+    { price: 0, commission: 0, net: 0 },
+  );
+
+  return (
+    <div>
+      <form className="mb-4 flex flex-wrap items-end gap-3" method="get">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Dal</label>
+          <input type="date" name="from" defaultValue={from} className="rounded-md border border-slate-300 px-2 py-1.5 text-sm" />
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-500">Al</label>
+          <input type="date" name="to" defaultValue={to} className="rounded-md border border-slate-300 px-2 py-1.5 text-sm" />
+        </div>
+        <button type="submit" className="rounded-md bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700">
+          Filtra
+        </button>
+      </form>
+
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <p className="text-xs uppercase text-slate-400">Fatturato transfer</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">€ {totals.price.toFixed(2)}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <p className="text-xs uppercase text-slate-400">Provvigione totale</p>
+          <p className="mt-1 text-2xl font-semibold text-purple-600">€ {totals.commission.toFixed(2)}</p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <p className="text-xs uppercase text-slate-400">Netto compagnia taxi</p>
+          <p className="mt-1 text-2xl font-semibold text-slate-900">€ {totals.net.toFixed(2)}</p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-400">
+            <tr>
+              <th className="px-3 py-2">Data</th>
+              <th className="px-3 py-2">Ospite</th>
+              <th className="px-3 py-2">Prezzo</th>
+              <th className="px-3 py-2">Provvigione</th>
+              <th className="px-3 py-2">Netto</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-3 py-6 text-center text-slate-400">
+                  Nessun transfer completato nel periodo selezionato.
+                </td>
+              </tr>
+            )}
+            {rows.map((r) => {
+              const { commission, net } = computeRow(r);
+              return (
+                <tr key={r.id}>
+                  <td className="px-3 py-2 text-slate-600">{r.date}</td>
+                  <td className="px-3 py-2">{r.guestName}</td>
+                  <td className="px-3 py-2 text-slate-600">{r.price != null ? `€ ${r.price.toFixed(2)}` : "—"}</td>
+                  <td className="px-3 py-2 text-slate-600">{commission != null ? `€ ${commission.toFixed(2)}` : "—"}</td>
+                  <td className="px-3 py-2 text-slate-600">{net != null ? `€ ${net.toFixed(2)}` : "—"}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

@@ -1,22 +1,33 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { cn } from "@/lib/cn";
+import { prisma } from "@/lib/prisma";
 import { BackButton } from "@/components/back-button";
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/notification-bell";
 
-export function DashboardShell({
+export async function DashboardShell({
   title,
   orgName,
   userName,
+  userId,
   nav,
   children,
 }: {
   title: string;
   orgName: string;
   userName: string;
+  userId: string;
   nav: { href: string; label: string }[];
   children: React.ReactNode;
 }) {
+  const notifications = await prisma.notification.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 15,
+  });
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-slate-200 bg-white">
@@ -41,6 +52,18 @@ export function DashboardShell({
             ))}
           </nav>
           <div className="flex items-center gap-3">
+            <NotificationBell
+              notifications={notifications.map((n) => ({
+                id: n.id,
+                type: n.type,
+                title: n.title,
+                body: n.body,
+                link: n.link,
+                read: n.read,
+                createdAt: n.createdAt.toISOString(),
+              }))}
+              unreadCount={unreadCount}
+            />
             <span className="text-sm text-slate-500">{userName}</span>
             <form
               action={async () => {

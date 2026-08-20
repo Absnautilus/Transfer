@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label } from "@/components/ui/field";
 import { StatusBadge } from "@/components/ui/badge";
 import { REQUEST_STATUS } from "@/lib/constants";
+import type { dictionaries } from "@/lib/i18n/dictionaries";
 import { lookupMyTransfers, type MyRequest, type MyTransfer } from "./actions";
 
-export function LookupForm() {
+type Dict = (typeof dictionaries)["it"]["myTransfers"];
+
+export function LookupForm({ dict }: { dict: Dict }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [results, setResults] = useState<{ transfers: MyTransfer[]; requests: MyRequest[] } | null>(null);
@@ -33,18 +36,18 @@ export function LookupForm() {
       <form onSubmit={onSubmit} className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <FieldGroup className="mb-0 flex-1">
           <Label htmlFor="email" required>
-            Email
+            {dict.email}
           </Label>
           <Input id="email" name="email" type="email" required />
         </FieldGroup>
         <FieldGroup className="mb-0 flex-1">
           <Label htmlFor="surname" required>
-            Cognome
+            {dict.surname}
           </Label>
           <Input id="surname" name="surname" required />
         </FieldGroup>
         <Button type="submit" disabled={pending} className="mb-4 sm:mb-0">
-          {pending ? "Ricerca…" : "Cerca"}
+          {pending ? dict.searchButtonPending : dict.searchButton}
         </Button>
       </form>
       <FieldError>{error ?? undefined}</FieldError>
@@ -52,9 +55,7 @@ export function LookupForm() {
       {results && (
         <div className="mt-6 space-y-3">
           {results.transfers.length === 0 && results.requests.length === 0 && (
-            <p className="text-sm text-slate-500">
-              Nessun transfer trovato con questa email e cognome. Controlla di averli scritti come nella richiesta originale.
-            </p>
+            <p className="text-sm text-slate-500">{dict.noResults}</p>
           )}
 
           {results.transfers.map((t) => (
@@ -84,13 +85,17 @@ export function LookupForm() {
                   <p className="text-sm text-slate-500">
                     {r.date} · {r.time}
                   </p>
-                  <p className="font-medium text-slate-900">Richiesta transfer</p>
+                  <p className="font-medium text-slate-900">{dict.requestLabel}</p>
                 </div>
                 <span className={r.status === REQUEST_STATUS.REJECTED ? "text-sm text-red-600" : "text-sm text-amber-600"}>
-                  {r.status === REQUEST_STATUS.REJECTED ? "Rifiutata" : "In attesa di verifica"}
+                  {r.status === REQUEST_STATUS.REJECTED ? dict.statusRejected : dict.statusPending}
                 </span>
               </div>
-              {r.rejectionReason && <p className="mt-2 text-sm text-slate-600">Motivo: {r.rejectionReason}</p>}
+              {r.rejectionReason && (
+                <p className="mt-2 text-sm text-slate-600">
+                  {dict.reasonLabel} {r.rejectionReason}
+                </p>
+              )}
             </div>
           ))}
         </div>

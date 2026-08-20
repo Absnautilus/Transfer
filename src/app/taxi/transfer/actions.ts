@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireTaxiUser } from "@/lib/session";
 import { TRANSFER_STATUS, TRIP_EVENT } from "@/lib/constants";
+import { notifyHotelStaff } from "@/lib/notifications";
 
 async function loadOwnedTransfer(transferId: string, taxiCompanyId: string) {
   const transfer = await prisma.transfer.findFirst({ where: { id: transferId, taxiCompanyId } });
@@ -13,11 +14,18 @@ async function loadOwnedTransfer(transferId: string, taxiCompanyId: string) {
 
 export async function confirmTransfer(transferId: string) {
   const user = await requireTaxiUser();
-  await loadOwnedTransfer(transferId, user.taxiCompanyId);
+  const transfer = await loadOwnedTransfer(transferId, user.taxiCompanyId);
 
   await prisma.transfer.update({
     where: { id: transferId },
     data: { status: TRANSFER_STATUS.CONFIRMED, updatedByUserId: user.id, taxiRejectionReason: null },
+  });
+
+  await notifyHotelStaff(transfer.hotelId, {
+    type: "TRANSFER_CONFIRMED",
+    title: "Transfer confermato dal taxi",
+    body: `${transfer.guestName} — ${transfer.date} ${transfer.time}`,
+    link: "/hotel/transfer",
   });
 
   revalidatePath("/taxi/transfer");
@@ -29,11 +37,18 @@ export async function rejectTransfer(formData: FormData) {
   const transferId = String(formData.get("transferId") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
   if (!reason) throw new Error("Indica il motivo del rifiuto.");
-  await loadOwnedTransfer(transferId, user.taxiCompanyId);
+  const transfer = await loadOwnedTransfer(transferId, user.taxiCompanyId);
 
   await prisma.transfer.update({
     where: { id: transferId },
     data: { status: TRANSFER_STATUS.REJECTED_BY_TAXI, taxiRejectionReason: reason, updatedByUserId: user.id },
+  });
+
+  await notifyHotelStaff(transfer.hotelId, {
+    type: "TRANSFER_REJECTED",
+    title: "Transfer rifiutato dal taxi",
+    body: `${transfer.guestName} — ${reason}`,
+    link: "/hotel/transfer",
   });
 
   revalidatePath("/taxi/transfer");

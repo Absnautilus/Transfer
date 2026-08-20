@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { guestRequestSchema } from "@/lib/validations";
 import { computePrice, isValidPriceTiers } from "@/lib/pricing";
+import { notifyHotelStaff } from "@/lib/notifications";
 
 export type SubmitRequestResult = { ok: true } | { ok: false; error: string };
 
@@ -47,10 +48,20 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
       routeFrom,
       routeTo,
       quotedPrice,
+      arrivalMode: data.direction === "ARRIVO" ? data.arrivalMode ?? null : null,
+      estimatedArrivalTime: data.estimatedArrivalTime || null,
       flightOrTrainNumber: data.flightOrTrainNumber || null,
       flightOrTrainOrigin: data.flightOrTrainOrigin || null,
       notes: data.notes || null,
+      locale: data.locale,
     },
+  });
+
+  await notifyHotelStaff(hotel.id, {
+    type: "REQUEST_NEW",
+    title: "Nuova richiesta transfer",
+    body: `${data.guestName} — ${data.date} ${data.time}`,
+    link: "/hotel/richieste",
   });
 
   return { ok: true };

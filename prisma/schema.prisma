@@ -41,6 +41,10 @@ model TaxiCompany {
   phone     String?
   createdAt DateTime @default(now())
 
+  // Percentage taken as commission on each transfer's price, e.g. 15 = 15%.
+  // Nullable: not every company has one configured yet.
+  commissionRate Float?
+
   users     User[]
   drivers   Driver[]
   transfers Transfer[]
@@ -55,13 +59,20 @@ model TaxiCompany {
 // priceTiers shape: { "day": { "1-4": 95, "5": 105, "6": 110, "7": 115, "8": 120 },
 //                      "night": { "1-4": 105, "5": 115, "6": 120, "7": 125, "8": 130 } }
 // Pax counts above the highest band use that band's price.
+// pointCategory: AEROPORTO | STAZIONE | PORTO | ALTRO — used to group/icon the
+// guest-facing point picker.
 model HotelRoute {
   id              String  @id @default(cuid())
   hotelId         String
   hotel           Hotel   @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  pointLabel      String // e.g. "Aeroporto Marco Polo (VCE)"
+  pointLabel      String // e.g. "Aeroporto Marco Polo (VCE)" — internal/fallback label
+  pointCategory   String  @default("ALTRO")
   transferMode    String? // e.g. "Auto privata" — null when the point has only one mode
-  description     String? // shown to the guest to help them choose a mode
+  // Per-locale text, shape { it, en, es, pt, fr, de } — all keys optional
+  // except "it" which is the required fallback. Split by direction because the
+  // meeting instructions differ (e.g. "we wait at arrivals" vs "pickup at the hotel lobby").
+  descriptionArrival   Json?
+  descriptionDeparture Json?
   durationMinutes Int?
   priceTiers      Json // see comment above
   active          Boolean @default(true)
@@ -78,6 +89,12 @@ model HotelRoute {
 // ---------------------------------------------------------------------------
 
 // role: HOTEL_STAFF | TAXI_STAFF | DRIVER | ADMIN
+//
+// isOrgAdmin: this user is the administrator of their Hotel/TaxiCompany —
+// can see accounting and grant permissions to other staff/drivers in the
+// same org. permissions: extra granular grants on top of the base role
+// (see src/lib/permissions.ts for the list of keys), for staff who aren't
+// full org admins but need one extra capability (e.g. VIEW_ACCOUNTING).
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -85,6 +102,8 @@ model User {
   name         String
   role         String
   phone        String?
+  isOrgAdmin   Boolean  @default(false)
+  permissions  Json     @default("[]")
   createdAt    DateTime @default(now())
 
   hotelId       String?
@@ -97,6 +116,8 @@ model User {
   reviewedRequests TransferRequest[] @relation("RequestReviewedBy")
   createdTransfers  Transfer[]       @relation("TransferCreatedBy")
   updatedTransfers  Transfer[]       @relation("TransferUpdatedBy")
+  cancelledTransfers Transfer[]      @relation("TransferCancelledBy")
+  notifications      Notification[]
 
   @@index([hotelId])
   @@index([taxiCompanyId])
@@ -147,9 +168,15 @@ model TransferRequest {
   routeFrom      String
   routeTo        String
   quotedPrice    Float?
-  flightOrTrainNumber String?
+  // How the guest reaches the meeting point when direction is ARRIVO:
+  // AUTO | AUTOBUS | TRENO | AEREO | NAVE. Null for PARTENZA requests.
+  arrivalMode         String?
+  estimatedArrivalTime String? // HH:mm, only meaningful for AUTO/AUTOBUS
+  flightOrTrainNumber String? // also used for ship name when arrivalMode = NAVE
   flightOrTrainOrigin String?
   notes          String?
+  // Guest's chosen language for the questionnaire/emails: it | en | es | pt | fr | de
+  locale String @default("it")
 
   // Review outcome
   reviewedAt       DateTime?
@@ -197,13 +224,30 @@ model Transfer {
   routeOption    HotelRoute? @relation(fields: [routeOptionId], references: [id], onDelete: SetNull)
   routeFrom      String
   routeTo        String
+  arrivalMode          String?
+  estimatedArrivalTime String?
   flightOrTrainNumber String?
   flightOrTrainOrigin String?
   notes          String?
   price          Float?
   operatorInitials String?
+  locale String @default("it")
+
+  // Commission owed to the taxi company on this transfer, snapshotted from
+  // TaxiCompany.commissionRate at confirmation time so later rate changes
+  // don't rewrite past accounting.
+  commissionRateSnapshot Float?
 
   taxiRejectionReason String?
+
+  // Cancellation — penaltyType: NONE | FULL | PARTIAL. penaltyAmount is only
+  // set when penaltyType = PARTIAL (the guest-owed amount).
+  cancelledAt         DateTime?
+  cancelledByUserId   String?
+  cancelledByUser     User?     @relation("TransferCancelledBy", fields: [cancelledByUserId], references: [id], onDelete: SetNull)
+  cancellationReason  String?
+  penaltyType         String?
+  penaltyAmount       Float?
 
   driverId String?
   driver   Driver? @relation(fields: [driverId], references: [id], onDelete: SetNull)
@@ -239,6 +283,24 @@ model TripStatusEvent {
   createdAt  DateTime @default(now())
 
   @@index([transferId])
+}
+
+// In-app notification for a staff/driver user. type is a short machine key
+// (e.g. "REQUEST_NEW", "REQUEST_ACCEPTED", "TRANSFER_CONFIRMED",
+// "TRANSFER_CANCELLED") used for icon/routing; link is an in-app path to
+// open when clicked.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
 }
 
 model EmailLog {

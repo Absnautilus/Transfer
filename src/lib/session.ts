@@ -18,6 +18,18 @@ export async function requireTaxiUser() {
   return session.user as typeof session.user & { taxiCompanyId: string };
 }
 
+export async function requireHotelOrgAdmin() {
+  const user = await requireHotelUser();
+  if (!user.isOrgAdmin) redirect("/hotel/richieste");
+  return user;
+}
+
+export async function requireTaxiOrgAdmin() {
+  const user = await requireTaxiUser();
+  if (!user.isOrgAdmin) redirect("/taxi/transfer");
+  return user;
+}
+
 export async function requireDriverUser() {
   const session = await auth();
   if (!session?.user || session.user.role !== ROLES.DRIVER || !session.user.driverId) {

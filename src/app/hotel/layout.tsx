@@ -2,7 +2,7 @@ import { requireHotelUser } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { DashboardShell } from "@/components/dashboard-shell";
 
-const NAV = [
+const BASE_NAV = [
   { href: "/hotel/richieste", label: "Richieste" },
   { href: "/hotel/transfer", label: "Transfer" },
   { href: "/hotel/tratte", label: "Tratte" },
@@ -11,9 +11,12 @@ const NAV = [
 export default async function HotelLayout({ children }: { children: React.ReactNode }) {
   const user = await requireHotelUser();
   const hotel = await prisma.hotel.findUnique({ where: { id: user.hotelId } });
+  const nav = user.isOrgAdmin
+    ? [...BASE_NAV, { href: "/hotel/contabilita", label: "Contabilità" }, { href: "/hotel/team", label: "Team" }]
+    : BASE_NAV;
 
   return (
-    <DashboardShell title="Dashboard Hotel" orgName={hotel?.name ?? "Hotel"} userName={user.name ?? user.email ?? ""} nav={NAV}>
+    <DashboardShell title="Dashboard Hotel" orgName={hotel?.name ?? "Hotel"} userName={user.name ?? user.email ?? ""} userId={user.id} nav={nav}>
       {children}
     </DashboardShell>
   );

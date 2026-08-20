@@ -5,21 +5,36 @@ import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
 import { PhoneInput } from "@/components/phone-input";
 import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing";
+import { localizedText, type Locale } from "@/lib/i18n/locales";
+import { t } from "@/lib/i18n/dictionaries";
 import { submitTransferRequest } from "./actions";
 
 type Route = {
   id: string;
   pointLabel: string;
+  pointCategory: string;
   transferMode: string | null;
-  description: string | null;
+  descriptionArrival: unknown;
+  descriptionDeparture: unknown;
   durationMinutes: number | null;
   priceTiers: unknown;
 };
 
-const CANCELLATION_POLICY =
-  "Cancellazioni gratuite fino a 3 ore prima dell'orario di arrivo previsto. Entro le 3 ore o in caso di mancata presentazione (no-show), il servizio non è rimborsabile. Per i servizi in partenza da aeroporti la tariffa include fino a 1 ora di attesa dall'atterraggio effettivo del volo; per gli altri punti d'incontro l'attesa inclusa è di 15 minuti, oltre la quale è previsto un supplemento di € 50,00.";
+const ARRIVAL_MODES = ["AEREO", "TRENO", "NAVE", "AUTO", "AUTOBUS"] as const;
+type ArrivalMode = (typeof ARRIVAL_MODES)[number];
 
-export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: string; hotelName: string; routes: Route[] }) {
+export function RequestForm({
+  hotelSlug,
+  hotelName,
+  routes,
+  locale,
+}: {
+  hotelSlug: string;
+  hotelName: string;
+  routes: Route[];
+  locale: Locale;
+}) {
+  const dict = t(locale).guestForm;
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -33,6 +48,7 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
 
   const [pax, setPax] = useState(1);
   const [isNightService, setIsNightService] = useState(false);
+  const [arrivalMode, setArrivalMode] = useState<ArrivalMode>("AEREO");
 
   const price = useMemo(() => {
     if (!selectedRoute || !isValidPriceTiers(selectedRoute.priceTiers)) return null;
@@ -48,16 +64,14 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
   if (submitted) {
     return (
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-6 text-center">
-        <p className="text-lg font-semibold text-emerald-800">Richiesta inviata!</p>
-        <p className="mt-2 text-sm text-emerald-700">
-          {hotelName} riceverà la sua richiesta e la contatterà via email non appena verrà verificata.
-        </p>
+        <p className="text-lg font-semibold text-emerald-800">{dict.submittedTitle}</p>
+        <p className="mt-2 text-sm text-emerald-700">{dict.submittedBody.replace("{hotelName}", hotelName)}</p>
       </div>
     );
   }
 
   if (routes.length === 0) {
-    return <p className="text-sm text-slate-500">Nessuna tratta configurata al momento. Contatti direttamente l&apos;hotel.</p>;
+    return <p className="text-sm text-slate-500">{dict.noRoutesConfigured}</p>;
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -66,6 +80,8 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
     const formData = new FormData(e.currentTarget);
     formData.set("routeOptionId", selectedRouteId);
     formData.set("direction", direction);
+    formData.set("locale", locale);
+    if (direction === "ARRIVO") formData.set("arrivalMode", arrivalMode);
     startTransition(async () => {
       const result = await submitTransferRequest(hotelSlug, formData);
       if (!result.ok) {
@@ -81,47 +97,47 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
         <FieldGroup>
           <Label htmlFor="guestName" required>
-            Nome e cognome
+            {dict.guestName}
           </Label>
           <Input id="guestName" name="guestName" required />
         </FieldGroup>
         <FieldGroup>
-          <Label htmlFor="roomNumber">Numero camera (se già assegnato)</Label>
+          <Label htmlFor="roomNumber">{dict.roomNumber}</Label>
           <Input id="roomNumber" name="roomNumber" />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="guestEmail" required>
-            Email
+            {dict.email}
           </Label>
           <Input id="guestEmail" name="guestEmail" type="email" required />
         </FieldGroup>
         <FieldGroup>
-          <Label htmlFor="bookingNumber">Numero prenotazione</Label>
+          <Label htmlFor="bookingNumber">{dict.bookingNumber}</Label>
           <Input id="bookingNumber" name="bookingNumber" />
         </FieldGroup>
       </div>
 
       <FieldGroup>
-        <Label required>Telefono</Label>
+        <Label required>{dict.phone}</Label>
         <PhoneInput name="guestPhone" required />
       </FieldGroup>
 
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
         <FieldGroup>
           <Label htmlFor="date" required>
-            Data
+            {dict.date}
           </Label>
           <Input id="date" name="date" type="date" required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="time" required>
-            Orario
+            {dict.time}
           </Label>
           <Input id="time" name="time" type="time" required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="pax" required>
-            Numero passeggeri
+            {dict.pax}
           </Label>
           <Input id="pax" name="pax" type="number" min={1} max={50} value={pax} onChange={(e) => setPax(Number(e.target.value) || 1)} required />
         </FieldGroup>
@@ -135,43 +151,43 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
               onChange={(e) => setIsNightService(e.target.checked)}
               className="h-4 w-4 rounded border-slate-300"
             />
-            Servizio notturno (22:00 – 07:00)
+            {dict.nightService}
           </label>
         </FieldGroup>
       </div>
 
       <FieldGroup>
-        <Label>Bagagli</Label>
+        <Label>{dict.bagsLabel}</Label>
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <p className="mb-1 text-xs text-slate-500">Cabina (≤ 55×40×20 cm)</p>
+            <p className="mb-1 text-xs text-slate-500">{dict.bagsCabin}</p>
             <Input name="bagsCabin" type="number" min={0} max={20} defaultValue={0} />
           </div>
           <div>
-            <p className="mb-1 text-xs text-slate-500">Stiva standard (≤ 23 kg)</p>
+            <p className="mb-1 text-xs text-slate-500">{dict.bagsStandard}</p>
             <Input name="bagsStandard" type="number" min={0} max={20} defaultValue={0} />
           </div>
           <div>
-            <p className="mb-1 text-xs text-slate-500">Grande / voluminoso</p>
+            <p className="mb-1 text-xs text-slate-500">{dict.bagsLarge}</p>
             <Input name="bagsLarge" type="number" min={0} max={20} defaultValue={0} />
           </div>
         </div>
       </FieldGroup>
 
       <FieldGroup>
-        <Label required>Transfer</Label>
+        <Label required>{dict.transferLabel}</Label>
         <div className="mb-2 flex gap-4 text-sm text-slate-600">
           <label className="flex items-center gap-1.5">
             <input type="radio" checked={direction === "ARRIVO"} onChange={() => setDirection("ARRIVO")} />
-            Arrivo (verso l&apos;hotel)
+            {dict.directionArrival}
           </label>
           <label className="flex items-center gap-1.5">
             <input type="radio" checked={direction === "PARTENZA"} onChange={() => setDirection("PARTENZA")} />
-            Partenza (dall&apos;hotel)
+            {dict.directionDeparture}
           </label>
         </div>
 
-        <p className="mb-1 text-xs text-slate-500">{direction === "ARRIVO" ? "Da dove arriva" : "Dove è diretto"}</p>
+        <p className="mb-1 text-xs text-slate-500">{direction === "ARRIVO" ? dict.fromPrompt : dict.toPrompt}</p>
         <div className="mb-3 flex flex-wrap gap-2">
           {points.map((p) => (
             <button
@@ -192,6 +208,10 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
             {modesForPoint.map((m) => {
               const modePrice =
                 isValidPriceTiers(m.priceTiers) ? computePrice(m.priceTiers as PriceTiers, pax, isNightService) : null;
+              const description = localizedText(
+                direction === "ARRIVO" ? m.descriptionArrival : m.descriptionDeparture,
+                locale,
+              );
               return (
                 <label
                   key={m.id}
@@ -208,9 +228,13 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
                         checked={m.id === selectedRouteId}
                         onChange={() => setSelectedRouteId(m.id)}
                       />
-                      <span className="font-medium text-slate-900">{m.transferMode ?? "Standard"}</span>
-                      {m.durationMinutes && <span className="ml-2 text-xs text-slate-500">~{m.durationMinutes} min</span>}
-                      {m.description && <p className="ml-5 mt-1 text-xs text-slate-500">{m.description}</p>}
+                      <span className="font-medium text-slate-900">{m.transferMode ?? dict.modeStandardFallback}</span>
+                      {m.durationMinutes && (
+                        <span className="ml-2 text-xs text-slate-500">
+                          ~{m.durationMinutes} {dict.durationSuffix}
+                        </span>
+                      )}
+                      {description && <p className="ml-5 mt-1 text-xs text-slate-500">{description}</p>}
                     </div>
                     <span className="whitespace-nowrap font-semibold text-slate-900">
                       {modePrice != null ? `€ ${modePrice.toFixed(2)}` : "—"}
@@ -224,36 +248,77 @@ export function RequestForm({ hotelSlug, hotelName, routes }: { hotelSlug: strin
 
         {price != null && (
           <p className="mt-2 text-sm text-slate-600">
-            Tariffa indicativa per {pax} pax{isNightService ? " (notturna)" : ""}: <strong>€ {price.toFixed(2)}</strong>
+            {dict.indicativePriceLabel.replace("{pax}", String(pax)).replace("{night}", isNightService ? dict.nightSuffix : "")}:{" "}
+            <strong>€ {price.toFixed(2)}</strong>
           </p>
         )}
       </FieldGroup>
 
-      <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+      {direction === "ARRIVO" && (
         <FieldGroup>
-          <Label htmlFor="flightOrTrainNumber">Numero volo / treno</Label>
-          <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
+          <Label required>{dict.arrivalModeQuestion}</Label>
+          <div className="mb-2 flex flex-wrap gap-3 text-sm text-slate-600">
+            {ARRIVAL_MODES.map((mode) => (
+              <label key={mode} className="flex items-center gap-1.5">
+                <input type="radio" checked={arrivalMode === mode} onChange={() => setArrivalMode(mode)} />
+                {t(locale).arrivalMode[mode]}
+              </label>
+            ))}
+          </div>
+
+          {arrivalMode === "AEREO" && (
+            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainNumber">{dict.flightNumberLabel}</Label>
+                <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
+              </FieldGroup>
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainOrigin">{dict.flightOriginLabel}</Label>
+                <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
+              </FieldGroup>
+            </div>
+          )}
+          {arrivalMode === "TRENO" && (
+            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainNumber">{dict.trainNumberLabel}</Label>
+                <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
+              </FieldGroup>
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainOrigin">{dict.trainOriginLabel}</Label>
+                <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
+              </FieldGroup>
+            </div>
+          )}
+          {arrivalMode === "NAVE" && (
+            <FieldGroup>
+              <Label htmlFor="flightOrTrainNumber">{dict.shipNameLabel}</Label>
+              <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
+            </FieldGroup>
+          )}
+          {(arrivalMode === "AUTO" || arrivalMode === "AUTOBUS") && (
+            <FieldGroup className="w-48">
+              <Label htmlFor="estimatedArrivalTime">{dict.estimatedArrivalTimeLabel}</Label>
+              <Input id="estimatedArrivalTime" name="estimatedArrivalTime" type="time" />
+            </FieldGroup>
+          )}
         </FieldGroup>
-        <FieldGroup>
-          <Label htmlFor="flightOrTrainOrigin">Provenienza volo / treno</Label>
-          <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
-        </FieldGroup>
-      </div>
+      )}
 
       <FieldGroup>
-        <Label htmlFor="notes">Note aggiuntive</Label>
-        <Textarea id="notes" name="notes" rows={3} placeholder="Passeggini, seggiolini, esigenze particolari…" />
+        <Label htmlFor="notes">{dict.notesLabel}</Label>
+        <Textarea id="notes" name="notes" rows={3} placeholder={dict.notesPlaceholder} />
       </FieldGroup>
 
       <div className="mb-4 rounded-md bg-slate-50 p-3 text-xs text-slate-500">
-        <p className="mb-1 font-medium text-slate-600">Politica di cancellazione</p>
-        {CANCELLATION_POLICY}
+        <p className="mb-1 font-medium text-slate-600">{dict.cancellationPolicyTitle}</p>
+        {dict.cancellationPolicyText}
       </div>
 
       <FieldError>{error ?? undefined}</FieldError>
 
       <Button type="submit" disabled={pending} className="mt-2 w-full">
-        {pending ? "Invio in corso…" : "Invia richiesta"}
+        {pending ? dict.submitButtonPending : dict.submitButton}
       </Button>
     </form>
   );

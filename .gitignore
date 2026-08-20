@@ -52,3 +52,6 @@ prisma/dev.db*
 /data/
 *.ncc-import.csv
 
+# local backup exports (may contain guest PII, never commit)
+/backups/
+

@@ -7,6 +7,7 @@ declare module "next-auth" {
     hotelId: string | null;
     taxiCompanyId: string | null;
     driverId: string | null;
+    isOrgAdmin: boolean;
   }
 
   interface Session {
@@ -16,6 +17,7 @@ declare module "next-auth" {
       hotelId: string | null;
       taxiCompanyId: string | null;
       driverId: string | null;
+      isOrgAdmin: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -26,5 +28,6 @@ declare module "next-auth/jwt" {
     hotelId: string | null;
     taxiCompanyId: string | null;
     driverId: string | null;
+    isOrgAdmin: boolean;
   }
 }
