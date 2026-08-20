@@ -8,7 +8,8 @@ import { formatBags } from "@/lib/bags";
 
 type Request = {
   id: string;
-  guestName: string;
+  guestFirstName: string;
+  guestLastName: string;
   guestEmail: string;
   guestPhone: string;
   roomNumber: string | null;
@@ -41,7 +42,9 @@ export function RequestRow({ request }: { request: Request }) {
     <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-semibold text-slate-900">{request.guestName}</p>
+          <p className="font-semibold text-slate-900">
+            {request.guestFirstName} {request.guestLastName}
+          </p>
           <p className="text-sm text-slate-500">
             {request.date} · {request.time} {request.isNightService && <span className="text-purple-600">(notturno)</span>}
           </p>

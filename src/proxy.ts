@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { ROLE_HOME, ROLES } from "@/lib/constants";
 
 const ROLE_PREFIX: Record<string, string[]> = {
+  "/admin": [ROLES.ADMIN],
   "/hotel": [ROLES.ADMIN, ROLES.HOTEL_STAFF],
   "/taxi": [ROLES.ADMIN, ROLES.TAXI_STAFF],
   "/driver": [ROLES.ADMIN, ROLES.DRIVER],
@@ -29,5 +30,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/hotel/:path*", "/taxi/:path*", "/driver/:path*"],
+  matcher: ["/admin/:path*", "/hotel/:path*", "/taxi/:path*", "/driver/:path*"],
 };

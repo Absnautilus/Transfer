@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { guestRequestSchema } from "@/lib/validations";
 import { computePrice, isValidPriceTiers } from "@/lib/pricing";
 import { notifyHotelStaff } from "@/lib/notifications";
+import { isNightTime } from "@/lib/night";
 
 export type SubmitRequestResult = { ok: true } | { ok: false; error: string };
 
@@ -25,14 +26,16 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
 
   const routeFrom = data.direction === "ARRIVO" ? routeOption.pointLabel : hotel.name;
   const routeTo = data.direction === "ARRIVO" ? hotel.name : routeOption.pointLabel;
+  const isNightService = isNightTime(data.time);
   const quotedPrice = isValidPriceTiers(routeOption.priceTiers)
-    ? computePrice(routeOption.priceTiers, data.pax, data.isNightService)
+    ? computePrice(routeOption.priceTiers, data.pax, isNightService)
     : null;
 
   await prisma.transferRequest.create({
     data: {
       hotelId: hotel.id,
-      guestName: data.guestName,
+      guestFirstName: data.guestFirstName,
+      guestLastName: data.guestLastName,
       guestEmail: data.guestEmail,
       guestPhone: data.guestPhone,
       roomNumber: data.roomNumber || null,
@@ -43,7 +46,7 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
       bagsLarge: data.bagsLarge,
       date: data.date,
       time: data.time,
-      isNightService: data.isNightService,
+      isNightService,
       routeOptionId: routeOption.id,
       routeFrom,
       routeTo,
@@ -60,7 +63,7 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
   await notifyHotelStaff(hotel.id, {
     type: "REQUEST_NEW",
     title: "Nuova richiesta transfer",
-    body: `${data.guestName} — ${data.date} ${data.time}`,
+    body: `${data.guestFirstName} ${data.guestLastName} — ${data.date} ${data.time}`,
     link: "/hotel/richieste",
   });
 

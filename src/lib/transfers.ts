@@ -11,7 +11,8 @@ export async function getTransfers(scope: { hotelId?: string; taxiCompanyId?: st
   if (filters.q && filters.q.trim().length > 0) {
     const q = filters.q.trim();
     where.OR = [
-      { guestName: { contains: q } },
+      { guestFirstName: { contains: q } },
+      { guestLastName: { contains: q } },
       { bookingNumber: { contains: q } },
       { roomNumber: { contains: q } },
     ];

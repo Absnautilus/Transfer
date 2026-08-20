@@ -34,7 +34,8 @@ export default async function GuestTrackingPage({
         <p className="mb-4 text-center text-sm font-medium text-slate-500">{transfer.hotel.name}</p>
         <TripStatusView
           trip={{
-            guestName: transfer.guestName,
+            guestFirstName: transfer.guestFirstName,
+            guestLastName: transfer.guestLastName,
             routeFrom: transfer.routeFrom,
             routeTo: transfer.routeTo,
             date: transfer.date,

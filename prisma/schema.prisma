@@ -151,7 +151,8 @@ model TransferRequest {
   status   String @default("PENDING")
 
   // Guest-provided info
-  guestName      String
+  guestFirstName String
+  guestLastName  String
   guestEmail     String
   guestPhone     String
   roomNumber     String?
@@ -210,13 +211,17 @@ model Transfer {
 
   status String @default("AWAITING_TAXI")
 
-  guestName      String
+  guestFirstName String
+  guestLastName  String
   guestEmail     String?
   guestPhone     String?
   roomNumber     String?
   bookingNumber  String?
   pax            Int
-  bags           String?
+  bags           String? // legacy free-text summary, kept for CSV imports; see bagsCabin/Standard/Large
+  bagsCabin      Int     @default(0)
+  bagsStandard   Int     @default(0)
+  bagsLarge      Int     @default(0)
   date           String // YYYY-MM-DD
   time           String // HH:mm
   isNightService Boolean @default(false)
@@ -230,6 +235,10 @@ model Transfer {
   flightOrTrainOrigin String?
   notes          String?
   price          Float?
+  // priceAdjustmentType: DISCOUNT | SURCHARGE — applied on top of price for
+  // the final amount owed; priceAdjustmentAmount is always a positive number.
+  priceAdjustmentType   String?
+  priceAdjustmentAmount Float?
   operatorInitials String?
   locale String @default("it")
 
@@ -270,7 +279,7 @@ model Transfer {
   @@index([taxiCompanyId, date])
   @@index([driverId])
   @@index([bookingNumber])
-  @@index([guestName])
+  @@index([guestLastName])
 }
 
 // status snapshots for the driver/guest shared trip screen

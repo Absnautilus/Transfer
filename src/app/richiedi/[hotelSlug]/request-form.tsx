@@ -4,9 +4,11 @@ import { useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
 import { PhoneInput } from "@/components/phone-input";
+import { BagsInput } from "@/components/bags-input";
 import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing";
 import { localizedText, type Locale } from "@/lib/i18n/locales";
 import { t } from "@/lib/i18n/dictionaries";
+import { isNightTime } from "@/lib/night";
 import { submitTransferRequest } from "./actions";
 
 type Route = {
@@ -47,7 +49,8 @@ export function RequestForm({
   const selectedRoute = modesForPoint.find((r) => r.id === selectedRouteId) ?? modesForPoint[0];
 
   const [pax, setPax] = useState(1);
-  const [isNightService, setIsNightService] = useState(false);
+  const [time, setTime] = useState("");
+  const isNightService = isNightTime(time);
   const [arrivalMode, setArrivalMode] = useState<ArrivalMode>("AEREO");
 
   const price = useMemo(() => {
@@ -96,10 +99,16 @@ export function RequestForm({
     <form onSubmit={onSubmit}>
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
         <FieldGroup>
-          <Label htmlFor="guestName" required>
-            {dict.guestName}
+          <Label htmlFor="guestFirstName" required>
+            {dict.guestFirstName}
           </Label>
-          <Input id="guestName" name="guestName" required />
+          <Input id="guestFirstName" name="guestFirstName" required />
+        </FieldGroup>
+        <FieldGroup>
+          <Label htmlFor="guestLastName" required>
+            {dict.guestLastName}
+          </Label>
+          <Input id="guestLastName" name="guestLastName" required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="roomNumber">{dict.roomNumber}</Label>
@@ -133,7 +142,7 @@ export function RequestForm({
           <Label htmlFor="time" required>
             {dict.time}
           </Label>
-          <Input id="time" name="time" type="time" required />
+          <Input id="time" name="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="pax" required>
@@ -141,37 +150,15 @@ export function RequestForm({
           </Label>
           <Input id="pax" name="pax" type="number" min={1} max={50} value={pax} onChange={(e) => setPax(Number(e.target.value) || 1)} required />
         </FieldGroup>
-        <FieldGroup className="flex items-end pb-1">
-          <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input
-              type="checkbox"
-              name="isNightService"
-              value="true"
-              checked={isNightService}
-              onChange={(e) => setIsNightService(e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300"
-            />
-            {dict.nightService}
-          </label>
+        <FieldGroup className="flex items-end pb-1 sm:col-span-2">
+          <p className="text-sm text-slate-500">
+            {dict.nightService}: <span className={isNightService ? "font-medium text-purple-600" : "text-slate-400"}>{isNightService ? "✓" : "—"}</span>
+          </p>
         </FieldGroup>
       </div>
 
       <FieldGroup>
-        <Label>{dict.bagsLabel}</Label>
-        <div className="grid grid-cols-3 gap-3">
-          <div>
-            <p className="mb-1 text-xs text-slate-500">{dict.bagsCabin}</p>
-            <Input name="bagsCabin" type="number" min={0} max={20} defaultValue={0} />
-          </div>
-          <div>
-            <p className="mb-1 text-xs text-slate-500">{dict.bagsStandard}</p>
-            <Input name="bagsStandard" type="number" min={0} max={20} defaultValue={0} />
-          </div>
-          <div>
-            <p className="mb-1 text-xs text-slate-500">{dict.bagsLarge}</p>
-            <Input name="bagsLarge" type="number" min={0} max={20} defaultValue={0} />
-          </div>
-        </div>
+        <BagsInput />
       </FieldGroup>
 
       <FieldGroup>

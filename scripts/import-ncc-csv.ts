@@ -92,6 +92,9 @@ async function main() {
       skipped++;
       continue;
     }
+    const lastSpace = guestName.lastIndexOf(" ");
+    const guestFirstName = lastSpace > -1 ? guestName.slice(0, lastSpace) : "";
+    const guestLastName = lastSpace > -1 ? guestName.slice(lastSpace + 1) : guestName;
 
     const cancelled = parseBool(row[CSV_COL.cxl] ?? "");
     const completed = parseBool(row[CSV_COL.evaso] ?? "");
@@ -116,7 +119,8 @@ async function main() {
       taxiCompanyId,
       driverId,
       status,
-      guestName,
+      guestFirstName,
+      guestLastName,
       guestPhone: row[CSV_COL.telefono]?.trim() || null,
       roomNumber: row[CSV_COL.cam]?.trim() || null,
       bookingNumber: row[CSV_COL.res]?.trim() || null,

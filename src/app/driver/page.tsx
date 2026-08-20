@@ -31,7 +31,9 @@ export default async function DriverHomePage() {
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-slate-900">{t.guestName}</p>
+                  <p className="font-semibold text-slate-900">
+                    {t.guestFirstName} {t.guestLastName}
+                  </p>
                   <p className="text-sm text-slate-500">
                     {t.date} · {t.time} · {t.routeFrom} → {t.routeTo}
                   </p>

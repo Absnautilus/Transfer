@@ -8,7 +8,8 @@ type Transfer = {
   date: string;
   time: string;
   isNightService: boolean;
-  guestName: string;
+  guestFirstName: string;
+  guestLastName: string;
   roomNumber: string | null;
   bookingNumber: string | null;
   pax: number;
@@ -71,7 +72,9 @@ export function TransfersTable({
                 {t.isNightService && <div className="text-xs font-normal text-purple-600">notturno</div>}
                 <div className="text-xs font-normal text-slate-400">{t.date}</div>
               </td>
-              <td className="px-3 py-3">{t.guestName}</td>
+              <td className="px-3 py-3">
+                {t.guestFirstName} {t.guestLastName}
+              </td>
               <td className="px-3 py-3 text-slate-600">
                 {t.roomNumber || "—"}
                 {t.bookingNumber && <div className="text-xs text-slate-400">{t.bookingNumber}</div>}

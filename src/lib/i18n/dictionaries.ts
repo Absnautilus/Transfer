@@ -8,7 +8,8 @@ const it = {
     pageSubtitle:
       "Compili il modulo con i dettagli del suo transfer. Riceverà una email di conferma appena la richiesta sarà verificata dal nostro staff.",
     sectionDetails: "Dettagli transfer",
-    guestName: "Nome e cognome",
+    guestFirstName: "Nome",
+    guestLastName: "Cognome",
     roomNumber: "Numero camera (se già assegnato)",
     email: "Email",
     bookingNumber: "Numero prenotazione",
@@ -86,7 +87,8 @@ const en: Dict = {
     pageSubtitle:
       "Fill in the details of your transfer. You'll receive a confirmation email as soon as your request has been reviewed by our staff.",
     sectionDetails: "Transfer details",
-    guestName: "Full name",
+    guestFirstName: "First name",
+    guestLastName: "Last name",
     roomNumber: "Room number (if already assigned)",
     email: "Email",
     bookingNumber: "Booking number",
@@ -162,7 +164,8 @@ const es: Dict = {
     pageSubtitle:
       "Complete el formulario con los detalles de su traslado. Recibirá un correo de confirmación en cuanto nuestro personal revise la solicitud.",
     sectionDetails: "Detalles del traslado",
-    guestName: "Nombre y apellidos",
+    guestFirstName: "Nombre",
+    guestLastName: "Apellidos",
     roomNumber: "Número de habitación (si ya está asignado)",
     email: "Correo electrónico",
     bookingNumber: "Número de reserva",
@@ -238,7 +241,8 @@ const pt: Dict = {
     pageSubtitle:
       "Preencha o formulário com os detalhes do seu transfer. Receberá um email de confirmação assim que o pedido for verificado pela nossa equipa.",
     sectionDetails: "Detalhes do transfer",
-    guestName: "Nome completo",
+    guestFirstName: "Nome próprio",
+    guestLastName: "Apelido",
     roomNumber: "Número do quarto (se já atribuído)",
     email: "Email",
     bookingNumber: "Número de reserva",
@@ -314,7 +318,8 @@ const fr: Dict = {
     pageSubtitle:
       "Remplissez le formulaire avec les détails de votre transfert. Vous recevrez un email de confirmation dès que votre demande aura été vérifiée par notre équipe.",
     sectionDetails: "Détails du transfert",
-    guestName: "Nom et prénom",
+    guestFirstName: "Prénom",
+    guestLastName: "Nom",
     roomNumber: "Numéro de chambre (si déjà attribué)",
     email: "Email",
     bookingNumber: "Numéro de réservation",
@@ -390,7 +395,8 @@ const de: Dict = {
     pageSubtitle:
       "Füllen Sie das Formular mit den Details Ihres Transfers aus. Sie erhalten eine Bestätigungs-E-Mail, sobald Ihre Anfrage von unserem Team geprüft wurde.",
     sectionDetails: "Transferdetails",
-    guestName: "Vor- und Nachname",
+    guestFirstName: "Vorname",
+    guestLastName: "Nachname",
     roomNumber: "Zimmernummer (falls bereits zugewiesen)",
     email: "E-Mail",
     bookingNumber: "Buchungsnummer",

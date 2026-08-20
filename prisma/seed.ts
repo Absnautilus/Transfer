@@ -15,6 +15,17 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const passwordHash = await bcrypt.hash("password123", 10);
 
+  await prisma.user.upsert({
+    where: { email: "admin@demo.local" },
+    update: {},
+    create: {
+      email: "admin@demo.local",
+      passwordHash,
+      name: "Amministratore piattaforma",
+      role: ROLES.ADMIN,
+    },
+  });
+
   const taxiCompany = await prisma.taxiCompany.upsert({
     where: { id: "demo-taxi-company" },
     update: {},
@@ -169,7 +180,8 @@ async function main() {
       data: [
         {
           hotelId: hotel.id,
-          guestName: "Sophie Dubois",
+          guestFirstName: "Sophie",
+          guestLastName: "Dubois",
           guestEmail: "sophie.dubois@example.com",
           guestPhone: "+33 6 12 34 56 78",
           roomNumber: "204",
@@ -188,7 +200,8 @@ async function main() {
         },
         {
           hotelId: hotel.id,
-          guestName: "James Whitfield",
+          guestFirstName: "James",
+          guestLastName: "Whitfield",
           guestEmail: "james.whitfield@example.com",
           guestPhone: "+44 7700 900123",
           roomNumber: "112",
@@ -216,7 +229,8 @@ async function main() {
         hotelId: hotel.id,
         taxiCompanyId: taxiCompany.id,
         status: TRANSFER_STATUS.AWAITING_TAXI,
-        guestName: "Elena Kowalski",
+        guestFirstName: "Elena",
+        guestLastName: "Kowalski",
         guestEmail: "elena.kowalski@example.com",
         guestPhone: "+48 600 123 456",
         roomNumber: "301",
@@ -239,7 +253,8 @@ async function main() {
         hotelId: hotel.id,
         taxiCompanyId: taxiCompany.id,
         status: TRANSFER_STATUS.CONFIRMED,
-        guestName: "The Anderson Family",
+        guestFirstName: "The Anderson",
+        guestLastName: "Family",
         guestEmail: "anderson.family@example.com",
         guestPhone: "+1 415 555 0134",
         roomNumber: "410",
@@ -263,7 +278,8 @@ async function main() {
         taxiCompanyId: taxiCompany.id,
         status: TRANSFER_STATUS.ASSIGNED,
         driverId: drivers[0].id,
-        guestName: "Marco Conti",
+        guestFirstName: "Marco",
+        guestLastName: "Conti",
         guestEmail: "marco.conti@example.com",
         guestPhone: "+39 335 1234567",
         roomNumber: "205",
@@ -286,7 +302,8 @@ async function main() {
         taxiCompanyId: taxiCompany.id,
         status: TRANSFER_STATUS.IN_PROGRESS,
         driverId: drivers[1].id,
-        guestName: "Yuki Tanaka",
+        guestFirstName: "Yuki",
+        guestLastName: "Tanaka",
         guestEmail: "yuki.tanaka@example.com",
         guestPhone: "+81 90 1234 5678",
         roomNumber: "118",
@@ -317,6 +334,7 @@ async function main() {
 
   console.log("\nSeed completato.");
   console.log("Accessi demo (password: password123):");
+  console.log("  Amministratore: admin@demo.local");
   console.log("  Hotel: hotel@demo.local");
   console.log("  Taxi:  taxi@demo.local");
   console.log("  Autista: marco.bianchi@demo.local");

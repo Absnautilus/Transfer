@@ -12,7 +12,16 @@ export default async function HotelContabilitaPage({ searchParams }: { searchPar
 
   const rows = await prisma.transfer.findMany({
     where: { hotelId: user.hotelId, status: TRANSFER_STATUS.COMPLETED, date: { gte: from, lte: to } },
-    select: { id: true, date: true, guestName: true, price: true, commissionRateSnapshot: true },
+    select: {
+      id: true,
+      date: true,
+      guestFirstName: true,
+      guestLastName: true,
+      price: true,
+      priceAdjustmentType: true,
+      priceAdjustmentAmount: true,
+      commissionRateSnapshot: true,
+    },
     orderBy: { date: "desc" },
   });
 

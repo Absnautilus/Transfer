@@ -40,7 +40,7 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
     prisma.transfer.findMany({
       where: {
         guestEmail: { equals: email, mode: "insensitive" },
-        guestName: { contains: surname, mode: "insensitive" },
+        guestLastName: { contains: surname, mode: "insensitive" },
       },
       orderBy: [{ date: "desc" }, { time: "desc" }],
       take: 20,
@@ -48,7 +48,7 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
     prisma.transferRequest.findMany({
       where: {
         guestEmail: { equals: email, mode: "insensitive" },
-        guestName: { contains: surname, mode: "insensitive" },
+        guestLastName: { contains: surname, mode: "insensitive" },
         status: { not: REQUEST_STATUS.ACCEPTED },
       },
       orderBy: { createdAt: "desc" },

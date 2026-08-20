@@ -7,6 +7,9 @@ import { requireHotelUser } from "@/lib/session";
 import { TRANSFER_STATUS } from "@/lib/constants";
 import { manualTransferSchema } from "@/lib/validations";
 import { notifyTaxiStaff } from "@/lib/notifications";
+import { isNightTime } from "@/lib/night";
+import { deriveInitials } from "@/lib/initials";
+import { formatBags } from "@/lib/bags";
 
 export async function createManualTransfer(formData: FormData) {
   const user = await requireHotelUser();
@@ -21,23 +24,29 @@ export async function createManualTransfer(formData: FormData) {
       hotelId: user.hotelId,
       taxiCompanyId: hotel?.primaryTaxiCompanyId ?? null,
       status: TRANSFER_STATUS.AWAITING_TAXI,
-      guestName: data.guestName,
+      guestFirstName: data.guestFirstName,
+      guestLastName: data.guestLastName,
       guestEmail: data.guestEmail || null,
       guestPhone: data.guestPhone || null,
       roomNumber: data.roomNumber || null,
       bookingNumber: data.bookingNumber || null,
       pax: data.pax,
-      bags: data.bags || null,
+      bags: formatBags(data.bagsCabin, data.bagsStandard, data.bagsLarge),
+      bagsCabin: data.bagsCabin,
+      bagsStandard: data.bagsStandard,
+      bagsLarge: data.bagsLarge,
       date: data.date,
       time: data.time,
-      isNightService: data.isNightService ?? false,
+      isNightService: isNightTime(data.time),
       routeFrom: data.routeFrom,
       routeTo: data.routeTo,
       flightOrTrainNumber: data.flightOrTrainNumber || null,
       flightOrTrainOrigin: data.flightOrTrainOrigin || null,
       notes: data.notes || null,
       price: data.price ?? null,
-      operatorInitials: data.operatorInitials || null,
+      priceAdjustmentType: data.priceAdjustmentType === "NONE" ? null : data.priceAdjustmentType,
+      priceAdjustmentAmount: data.priceAdjustmentType !== "NONE" ? data.priceAdjustmentAmount ?? null : null,
+      operatorInitials: deriveInitials(user.name ?? user.email ?? ""),
       createdByUserId: user.id,
     },
   });
@@ -60,23 +69,29 @@ export async function updateTransfer(formData: FormData) {
   await prisma.transfer.update({
     where: { id: existing.id },
     data: {
-      guestName: data.guestName,
+      guestFirstName: data.guestFirstName,
+      guestLastName: data.guestLastName,
       guestEmail: data.guestEmail || null,
       guestPhone: data.guestPhone || null,
       roomNumber: data.roomNumber || null,
       bookingNumber: data.bookingNumber || null,
       pax: data.pax,
-      bags: data.bags || null,
+      bags: formatBags(data.bagsCabin, data.bagsStandard, data.bagsLarge),
+      bagsCabin: data.bagsCabin,
+      bagsStandard: data.bagsStandard,
+      bagsLarge: data.bagsLarge,
       date: data.date,
       time: data.time,
-      isNightService: data.isNightService ?? false,
+      isNightService: isNightTime(data.time),
       routeFrom: data.routeFrom,
       routeTo: data.routeTo,
       flightOrTrainNumber: data.flightOrTrainNumber || null,
       flightOrTrainOrigin: data.flightOrTrainOrigin || null,
       notes: data.notes || null,
       price: data.price ?? null,
-      operatorInitials: data.operatorInitials || null,
+      priceAdjustmentType: data.priceAdjustmentType === "NONE" ? null : data.priceAdjustmentType,
+      priceAdjustmentAmount: data.priceAdjustmentType !== "NONE" ? data.priceAdjustmentAmount ?? null : null,
+      operatorInitials: deriveInitials(user.name ?? user.email ?? ""),
       updatedByUserId: user.id,
     },
   });
@@ -115,7 +130,7 @@ export async function cancelTransfer(formData: FormData) {
     await notifyTaxiStaff(existing.taxiCompanyId, {
       type: "TRANSFER_CANCELLED",
       title: "Transfer annullato dall'hotel",
-      body: `${existing.guestName} — ${existing.date} ${existing.time}`,
+      body: `${existing.guestFirstName} ${existing.guestLastName} — ${existing.date} ${existing.time}`,
       link: "/taxi/transfer",
     });
   }

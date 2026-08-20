@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 const STEPS: TripEvent[] = [TRIP_EVENT.ASSIGNED, TRIP_EVENT.EN_ROUTE, TRIP_EVENT.ARRIVED, TRIP_EVENT.STARTED, TRIP_EVENT.COMPLETED];
 
 export type TripInfo = {
-  guestName: string;
+  guestFirstName: string;
+  guestLastName: string;
   routeFrom: string;
   routeTo: string;
   date: string;
@@ -37,7 +38,9 @@ export function TripStatusView({
     <div>
       <div className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="mb-1 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">{trip.guestName}</h2>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {trip.guestFirstName} {trip.guestLastName}
+          </h2>
           {lastEvent && <Badge>{stepLabels[lastEvent.status as TripEvent] ?? lastEvent.status}</Badge>}
         </div>
         <p className="text-sm text-slate-500">

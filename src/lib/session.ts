@@ -30,6 +30,16 @@ export async function requireTaxiOrgAdmin() {
   return user;
 }
 
+// Platform-level master admin — not scoped to a single hotel or taxi
+// company, unlike isOrgAdmin (which scopes an admin to their own org).
+export async function requireAdmin() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== ROLES.ADMIN) {
+    redirect("/login");
+  }
+  return session.user;
+}
+
 export async function requireDriverUser() {
   const session = await auth();
   if (!session?.user || session.user.role !== ROLES.DRIVER || !session.user.driverId) {

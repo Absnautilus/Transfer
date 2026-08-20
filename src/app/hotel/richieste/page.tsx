@@ -63,7 +63,9 @@ export default async function HotelRequestsPage() {
               <tbody className="divide-y divide-slate-100">
                 {recent.map((r) => (
                   <tr key={r.id}>
-                    <td className="px-4 py-2">{r.guestName}</td>
+                    <td className="px-4 py-2">
+                      {r.guestFirstName} {r.guestLastName}
+                    </td>
                     <td className="px-4 py-2">
                       {r.date} {r.time}
                     </td>

@@ -11,13 +11,14 @@ export const LOCALE_LABEL: Record<Locale, string> = {
   de: "Deutsch",
 };
 
-export const LOCALE_FLAG: Record<Locale, string> = {
-  it: "🇮🇹",
-  en: "🇬🇧",
-  es: "🇪🇸",
-  pt: "🇵🇹",
-  fr: "🇫🇷",
-  de: "🇩🇪",
+// ISO 3166-1 alpha-2 codes used to render a colored SVG flag (country-flag-icons).
+export const LOCALE_ISO: Record<Locale, string> = {
+  it: "IT",
+  en: "GB",
+  es: "ES",
+  pt: "PT",
+  fr: "FR",
+  de: "DE",
 };
 
 export const LOCALE_COOKIE = "locale";

@@ -1,22 +1,32 @@
 type Row = {
   id: string;
   date: string;
-  guestName: string;
+  guestFirstName: string;
+  guestLastName: string;
   price: number | null;
+  priceAdjustmentType: string | null;
+  priceAdjustmentAmount: number | null;
   commissionRateSnapshot: number | null;
 };
 
 function computeRow(r: Row) {
-  const commission = r.price != null && r.commissionRateSnapshot != null ? (r.price * r.commissionRateSnapshot) / 100 : null;
-  const net = r.price != null && commission != null ? r.price - commission : null;
-  return { commission, net };
+  const adjustment =
+    r.priceAdjustmentType === "SURCHARGE"
+      ? (r.priceAdjustmentAmount ?? 0)
+      : r.priceAdjustmentType === "DISCOUNT"
+        ? -(r.priceAdjustmentAmount ?? 0)
+        : 0;
+  const finalPrice = r.price != null ? r.price + adjustment : null;
+  const commission = finalPrice != null && r.commissionRateSnapshot != null ? (finalPrice * r.commissionRateSnapshot) / 100 : null;
+  const net = finalPrice != null && commission != null ? finalPrice - commission : null;
+  return { finalPrice, commission, net };
 }
 
 export function AccountingView({ rows, from, to }: { rows: Row[]; from: string; to: string }) {
   const totals = rows.reduce(
     (acc, r) => {
-      const { commission, net } = computeRow(r);
-      acc.price += r.price ?? 0;
+      const { finalPrice, commission, net } = computeRow(r);
+      acc.price += finalPrice ?? 0;
       acc.commission += commission ?? 0;
       acc.net += net ?? 0;
       return acc;
@@ -75,12 +85,21 @@ export function AccountingView({ rows, from, to }: { rows: Row[]; from: string; 
               </tr>
             )}
             {rows.map((r) => {
-              const { commission, net } = computeRow(r);
+              const { finalPrice, commission, net } = computeRow(r);
               return (
                 <tr key={r.id}>
                   <td className="px-3 py-2 text-slate-600">{r.date}</td>
-                  <td className="px-3 py-2">{r.guestName}</td>
-                  <td className="px-3 py-2 text-slate-600">{r.price != null ? `€ ${r.price.toFixed(2)}` : "—"}</td>
+                  <td className="px-3 py-2">
+                    {r.guestFirstName} {r.guestLastName}
+                  </td>
+                  <td className="px-3 py-2 text-slate-600">
+                    {finalPrice != null ? `€ ${finalPrice.toFixed(2)}` : "—"}
+                    {r.priceAdjustmentType && r.priceAdjustmentType !== "NONE" && (
+                      <span className="ml-1 text-xs text-slate-400">
+                        ({r.priceAdjustmentType === "DISCOUNT" ? "sconto" : "maggiorazione"} € {(r.priceAdjustmentAmount ?? 0).toFixed(2)})
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-2 text-slate-600">{commission != null ? `€ ${commission.toFixed(2)}` : "—"}</td>
                   <td className="px-3 py-2 text-slate-600">{net != null ? `€ ${net.toFixed(2)}` : "—"}</td>
                 </tr>

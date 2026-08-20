@@ -24,7 +24,7 @@ export async function confirmTransfer(transferId: string) {
   await notifyHotelStaff(transfer.hotelId, {
     type: "TRANSFER_CONFIRMED",
     title: "Transfer confermato dal taxi",
-    body: `${transfer.guestName} — ${transfer.date} ${transfer.time}`,
+    body: `${transfer.guestFirstName} ${transfer.guestLastName} — ${transfer.date} ${transfer.time}`,
     link: "/hotel/transfer",
   });
 
@@ -47,7 +47,7 @@ export async function rejectTransfer(formData: FormData) {
   await notifyHotelStaff(transfer.hotelId, {
     type: "TRANSFER_REJECTED",
     title: "Transfer rifiutato dal taxi",
-    body: `${transfer.guestName} — ${reason}`,
+    body: `${transfer.guestFirstName} ${transfer.guestLastName} — ${reason}`,
     link: "/hotel/transfer",
   });
 

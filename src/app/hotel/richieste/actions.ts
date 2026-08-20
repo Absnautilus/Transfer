@@ -30,13 +30,17 @@ export async function acceptRequest(requestId: string) {
         taxiCompanyId: request.hotel.primaryTaxiCompanyId,
         requestId: request.id,
         status: TRANSFER_STATUS.AWAITING_TAXI,
-        guestName: request.guestName,
+        guestFirstName: request.guestFirstName,
+        guestLastName: request.guestLastName,
         guestEmail: request.guestEmail,
         guestPhone: request.guestPhone,
         roomNumber: request.roomNumber,
         bookingNumber: request.bookingNumber,
         pax: request.pax,
         bags: formatBags(request.bagsCabin, request.bagsStandard, request.bagsLarge),
+        bagsCabin: request.bagsCabin,
+        bagsStandard: request.bagsStandard,
+        bagsLarge: request.bagsLarge,
         date: request.date,
         time: request.time,
         isNightService: request.isNightService,
@@ -60,14 +64,14 @@ export async function acceptRequest(requestId: string) {
     await notifyTaxiStaff(request.hotel.primaryTaxiCompanyId, {
       type: "TRANSFER_NEW",
       title: "Nuovo transfer da confermare",
-      body: `${transfer.guestName} — ${transfer.date} ${transfer.time}`,
+      body: `${transfer.guestFirstName} ${transfer.guestLastName} — ${transfer.date} ${transfer.time}`,
       link: "/taxi/transfer",
     });
   }
 
   await sendRequestAcceptedEmail({
     guestEmail: request.guestEmail,
-    guestName: request.guestName,
+    guestName: `${request.guestFirstName} ${request.guestLastName}`,
     hotelName: request.hotel.name,
     date: request.date,
     time: request.time,
@@ -104,7 +108,7 @@ export async function rejectRequest(formData: FormData) {
 
   await sendRequestRejectedEmail({
     guestEmail: request.guestEmail,
-    guestName: request.guestName,
+    guestName: `${request.guestFirstName} ${request.guestLastName}`,
     hotelName: request.hotel.name,
     reason: parsed.data.reason,
   });

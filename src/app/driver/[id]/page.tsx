@@ -22,7 +22,8 @@ export default async function DriverTripPage({ params }: { params: Promise<{ id:
     <div className="mx-auto max-w-md">
       <TripStatusView
         trip={{
-          guestName: transfer.guestName,
+          guestFirstName: transfer.guestFirstName,
+          guestLastName: transfer.guestLastName,
           routeFrom: transfer.routeFrom,
           routeTo: transfer.routeTo,
           date: transfer.date,
