@@ -38,6 +38,14 @@ const it = {
     trainOriginLabel: "Stazione di provenienza",
     shipNameLabel: "Nome nave",
     estimatedArrivalTimeLabel: "Orario stimato di arrivo",
+    arrivalModeCarBusNote:
+      "È sufficiente l'orario indicato sopra come stima del suo arrivo: sarà contattato dalla compagnia di taxi prima dell'orario previsto per coordinare il ritiro.",
+    flightCheckButton: "Verifica volo",
+    flightCheckChecking: "Verifica in corso…",
+    flightCheckNotConfigured: "Verifica automatica dei voli non ancora attiva.",
+    flightCheckNotFound: "Non abbiamo trovato questo volo. Controlli il numero inserito.",
+    flightCheckFound: "Volo trovato — arrivo previsto alle {time}.",
+    flightCheckMismatch: "Attenzione: l'orario del volo risulta diverso da quello inserito ({time}).",
     notesLabel: "Note aggiuntive",
     notesPlaceholder: "Passeggini, seggiolini, esigenze particolari…",
     cancellationPolicyTitle: "Politica di cancellazione",
@@ -48,6 +56,7 @@ const it = {
     submittedTitle: "Richiesta inviata!",
     submittedBody: "{hotelName} riceverà la sua richiesta e la contatterà via email non appena verrà verificata.",
     noRoutesConfigured: "Nessuna tratta configurata al momento. Contatti direttamente l'hotel.",
+    checkStatusLink: "Verifica lo stato della tua richiesta",
   },
   tracking: {
     autoRefreshNote: "Questa pagina si aggiorna automaticamente.",
@@ -74,6 +83,15 @@ const it = {
     statusPending: "In attesa di verifica",
     statusRejected: "Rifiutata",
     reasonLabel: "Motivo:",
+    flightTrainLabel: "Volo / Treno",
+    priceLabel: "Tariffa",
+    status: {
+      ACCEPTED: "Accettato dall'hotel",
+      CONFIRMED: "Confermato",
+      IN_PROGRESS: "In corso",
+      COMPLETED: "Completato",
+      CANCELLED: "Annullato",
+    },
   },
 };
 
@@ -117,6 +135,14 @@ const en: Dict = {
     trainOriginLabel: "Departure station",
     shipNameLabel: "Ship name",
     estimatedArrivalTimeLabel: "Estimated arrival time",
+    arrivalModeCarBusNote:
+      "The time entered above is enough as your estimated arrival: the taxi company will contact you before then to coordinate pickup.",
+    flightCheckButton: "Check flight",
+    flightCheckChecking: "Checking…",
+    flightCheckNotConfigured: "Automatic flight verification isn't active yet.",
+    flightCheckNotFound: "We couldn't find this flight. Please check the number.",
+    flightCheckFound: "Flight found — arrival expected at {time}.",
+    flightCheckMismatch: "Note: the flight's arrival time differs from the one entered ({time}).",
     notesLabel: "Additional notes",
     notesPlaceholder: "Strollers, child seats, special needs…",
     cancellationPolicyTitle: "Cancellation policy",
@@ -127,6 +153,7 @@ const en: Dict = {
     submittedTitle: "Request sent!",
     submittedBody: "{hotelName} will receive your request and contact you by email as soon as it's been reviewed.",
     noRoutesConfigured: "No routes configured yet. Please contact the hotel directly.",
+    checkStatusLink: "Check the status of your request",
   },
   tracking: {
     autoRefreshNote: "This page refreshes automatically.",
@@ -153,6 +180,15 @@ const en: Dict = {
     statusPending: "Awaiting review",
     statusRejected: "Rejected",
     reasonLabel: "Reason:",
+    flightTrainLabel: "Flight / Train",
+    priceLabel: "Fare",
+    status: {
+      ACCEPTED: "Accepted by the hotel",
+      CONFIRMED: "Confirmed",
+      IN_PROGRESS: "In progress",
+      COMPLETED: "Completed",
+      CANCELLED: "Cancelled",
+    },
   },
 };
 
@@ -194,6 +230,14 @@ const es: Dict = {
     trainOriginLabel: "Estación de origen",
     shipNameLabel: "Nombre del barco",
     estimatedArrivalTimeLabel: "Hora estimada de llegada",
+    arrivalModeCarBusNote:
+      "Basta con la hora indicada arriba como estimación de llegada: la compañía de taxis se pondrá en contacto antes para coordinar la recogida.",
+    flightCheckButton: "Verificar vuelo",
+    flightCheckChecking: "Verificando…",
+    flightCheckNotConfigured: "La verificación automática de vuelos aún no está activa.",
+    flightCheckNotFound: "No hemos encontrado este vuelo. Compruebe el número indicado.",
+    flightCheckFound: "Vuelo encontrado — llegada prevista a las {time}.",
+    flightCheckMismatch: "Atención: la hora del vuelo difiere de la indicada ({time}).",
     notesLabel: "Notas adicionales",
     notesPlaceholder: "Carritos de bebé, sillas infantiles, necesidades especiales…",
     cancellationPolicyTitle: "Política de cancelación",
@@ -204,6 +248,7 @@ const es: Dict = {
     submittedTitle: "¡Solicitud enviada!",
     submittedBody: "{hotelName} recibirá su solicitud y se pondrá en contacto por correo en cuanto sea revisada.",
     noRoutesConfigured: "Aún no hay trayectos configurados. Contacte directamente con el hotel.",
+    checkStatusLink: "Consulta el estado de tu solicitud",
   },
   tracking: {
     autoRefreshNote: "Esta página se actualiza automáticamente.",
@@ -230,6 +275,15 @@ const es: Dict = {
     statusPending: "Pendiente de revisión",
     statusRejected: "Rechazada",
     reasonLabel: "Motivo:",
+    flightTrainLabel: "Vuelo / Tren",
+    priceLabel: "Tarifa",
+    status: {
+      ACCEPTED: "Aceptado por el hotel",
+      CONFIRMED: "Confirmado",
+      IN_PROGRESS: "En curso",
+      COMPLETED: "Completado",
+      CANCELLED: "Cancelado",
+    },
   },
 };
 
@@ -271,6 +325,14 @@ const pt: Dict = {
     trainOriginLabel: "Estação de origem",
     shipNameLabel: "Nome do navio",
     estimatedArrivalTimeLabel: "Hora estimada de chegada",
+    arrivalModeCarBusNote:
+      "Basta a hora indicada acima como estimativa de chegada: a companhia de táxis entrará em contacto antes para combinar a recolha.",
+    flightCheckButton: "Verificar voo",
+    flightCheckChecking: "A verificar…",
+    flightCheckNotConfigured: "A verificação automática de voos ainda não está ativa.",
+    flightCheckNotFound: "Não encontrámos este voo. Verifique o número indicado.",
+    flightCheckFound: "Voo encontrado — chegada prevista às {time}.",
+    flightCheckMismatch: "Atenção: a hora do voo é diferente da indicada ({time}).",
     notesLabel: "Notas adicionais",
     notesPlaceholder: "Carrinhos de bebé, cadeiras infantis, necessidades especiais…",
     cancellationPolicyTitle: "Política de cancelamento",
@@ -281,6 +343,7 @@ const pt: Dict = {
     submittedTitle: "Pedido enviado!",
     submittedBody: "{hotelName} irá receber o seu pedido e entrará em contacto por email assim que for verificado.",
     noRoutesConfigured: "Ainda não há trajetos configurados. Contacte diretamente o hotel.",
+    checkStatusLink: "Verifique o estado do seu pedido",
   },
   tracking: {
     autoRefreshNote: "Esta página atualiza-se automaticamente.",
@@ -307,6 +370,15 @@ const pt: Dict = {
     statusPending: "Aguardando verificação",
     statusRejected: "Rejeitado",
     reasonLabel: "Motivo:",
+    flightTrainLabel: "Voo / Comboio",
+    priceLabel: "Tarifa",
+    status: {
+      ACCEPTED: "Aceite pelo hotel",
+      CONFIRMED: "Confirmado",
+      IN_PROGRESS: "Em curso",
+      COMPLETED: "Concluído",
+      CANCELLED: "Cancelado",
+    },
   },
 };
 
@@ -348,6 +420,14 @@ const fr: Dict = {
     trainOriginLabel: "Gare de départ",
     shipNameLabel: "Nom du navire",
     estimatedArrivalTimeLabel: "Heure d'arrivée estimée",
+    arrivalModeCarBusNote:
+      "L'heure indiquée ci-dessus suffit comme estimation d'arrivée : la compagnie de taxis vous contactera avant pour coordonner la prise en charge.",
+    flightCheckButton: "Vérifier le vol",
+    flightCheckChecking: "Vérification…",
+    flightCheckNotConfigured: "La vérification automatique des vols n'est pas encore active.",
+    flightCheckNotFound: "Nous n'avons pas trouvé ce vol. Vérifiez le numéro saisi.",
+    flightCheckFound: "Vol trouvé — arrivée prévue à {time}.",
+    flightCheckMismatch: "Attention : l'heure du vol diffère de celle indiquée ({time}).",
     notesLabel: "Notes supplémentaires",
     notesPlaceholder: "Poussettes, sièges enfants, besoins particuliers…",
     cancellationPolicyTitle: "Politique d'annulation",
@@ -358,6 +438,7 @@ const fr: Dict = {
     submittedTitle: "Demande envoyée !",
     submittedBody: "{hotelName} recevra votre demande et vous contactera par email dès qu'elle aura été vérifiée.",
     noRoutesConfigured: "Aucun trajet configuré pour le moment. Veuillez contacter directement l'hôtel.",
+    checkStatusLink: "Vérifiez l'état de votre demande",
   },
   tracking: {
     autoRefreshNote: "Cette page se met à jour automatiquement.",
@@ -384,6 +465,15 @@ const fr: Dict = {
     statusPending: "En attente de vérification",
     statusRejected: "Refusée",
     reasonLabel: "Motif :",
+    flightTrainLabel: "Vol / Train",
+    priceLabel: "Tarif",
+    status: {
+      ACCEPTED: "Accepté par l'hôtel",
+      CONFIRMED: "Confirmé",
+      IN_PROGRESS: "En cours",
+      COMPLETED: "Terminé",
+      CANCELLED: "Annulé",
+    },
   },
 };
 
@@ -425,6 +515,14 @@ const de: Dict = {
     trainOriginLabel: "Abfahrtsbahnhof",
     shipNameLabel: "Name des Schiffs",
     estimatedArrivalTimeLabel: "Voraussichtliche Ankunftszeit",
+    arrivalModeCarBusNote:
+      "Die oben angegebene Uhrzeit genügt als voraussichtliche Ankunft: Das Taxiunternehmen meldet sich vorher, um die Abholung zu koordinieren.",
+    flightCheckButton: "Flug prüfen",
+    flightCheckChecking: "Wird geprüft…",
+    flightCheckNotConfigured: "Die automatische Flugprüfung ist noch nicht aktiv.",
+    flightCheckNotFound: "Dieser Flug wurde nicht gefunden. Bitte die Nummer prüfen.",
+    flightCheckFound: "Flug gefunden — Ankunft voraussichtlich um {time}.",
+    flightCheckMismatch: "Hinweis: Die Ankunftszeit des Flugs weicht von der eingegebenen ab ({time}).",
     notesLabel: "Zusätzliche Hinweise",
     notesPlaceholder: "Kinderwagen, Kindersitze, besondere Anforderungen…",
     cancellationPolicyTitle: "Stornierungsbedingungen",
@@ -435,6 +533,7 @@ const de: Dict = {
     submittedTitle: "Anfrage gesendet!",
     submittedBody: "{hotelName} erhält Ihre Anfrage und wird Sie per E-Mail kontaktieren, sobald sie geprüft wurde.",
     noRoutesConfigured: "Derzeit sind keine Strecken konfiguriert. Bitte wenden Sie sich direkt an das Hotel.",
+    checkStatusLink: "Status Ihrer Anfrage prüfen",
   },
   tracking: {
     autoRefreshNote: "Diese Seite wird automatisch aktualisiert.",
@@ -461,6 +560,15 @@ const de: Dict = {
     statusPending: "Prüfung ausstehend",
     statusRejected: "Abgelehnt",
     reasonLabel: "Grund:",
+    flightTrainLabel: "Flug / Zug",
+    priceLabel: "Preis",
+    status: {
+      ACCEPTED: "Vom Hotel angenommen",
+      CONFIRMED: "Bestätigt",
+      IN_PROGRESS: "Unterwegs",
+      COMPLETED: "Abgeschlossen",
+      CANCELLED: "Storniert",
+    },
   },
 };
 

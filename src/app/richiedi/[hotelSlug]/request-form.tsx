@@ -9,7 +9,7 @@ import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing"
 import { localizedText, type Locale } from "@/lib/i18n/locales";
 import { t } from "@/lib/i18n/dictionaries";
 import { isNightTime } from "@/lib/night";
-import { submitTransferRequest } from "./actions";
+import { submitTransferRequest, checkFlight, type FlightCheckResult } from "./actions";
 
 type Route = {
   id: string;
@@ -38,7 +38,7 @@ export function RequestForm({
 }) {
   const dict = t(locale).guestForm;
   const [error, setError] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState<{ email: string; surname: string } | null>(null);
   const [pending, startTransition] = useTransition();
 
   const points = useMemo(() => Array.from(new Set(routes.map((r) => r.pointLabel))), [routes]);
@@ -49,9 +49,13 @@ export function RequestForm({
   const selectedRoute = modesForPoint.find((r) => r.id === selectedRouteId) ?? modesForPoint[0];
 
   const [pax, setPax] = useState(1);
+  const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const isNightService = isNightTime(time);
   const [arrivalMode, setArrivalMode] = useState<ArrivalMode>("AEREO");
+  const [flightNumber, setFlightNumber] = useState("");
+  const [flightCheck, setFlightCheck] = useState<FlightCheckResult | null>(null);
+  const [flightChecking, startFlightCheck] = useTransition();
 
   const price = useMemo(() => {
     if (!selectedRoute || !isValidPriceTiers(selectedRoute.priceTiers)) return null;
@@ -64,11 +68,27 @@ export function RequestForm({
     setSelectedRouteId(modes[0]?.id ?? "");
   }
 
+  function onCheckFlight() {
+    if (!flightNumber.trim() || !date) return;
+    setFlightCheck(null);
+    startFlightCheck(async () => {
+      const result = await checkFlight(flightNumber, date, time);
+      setFlightCheck(result);
+    });
+  }
+
   if (submitted) {
+    const statusUrl = `/miei-transfer?lang=${locale}&email=${encodeURIComponent(submitted.email)}&surname=${encodeURIComponent(submitted.surname)}`;
     return (
       <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-6 text-center">
         <p className="text-lg font-semibold text-emerald-800">{dict.submittedTitle}</p>
         <p className="mt-2 text-sm text-emerald-700">{dict.submittedBody.replace("{hotelName}", hotelName)}</p>
+        <a
+          href={statusUrl}
+          className="mt-4 inline-block rounded-md bg-white px-4 py-2 text-sm font-medium text-emerald-800 shadow-sm hover:bg-emerald-50"
+        >
+          {dict.checkStatusLink}
+        </a>
       </div>
     );
   }
@@ -85,13 +105,15 @@ export function RequestForm({
     formData.set("direction", direction);
     formData.set("locale", locale);
     if (direction === "ARRIVO") formData.set("arrivalMode", arrivalMode);
+    const email = String(formData.get("guestEmail") ?? "");
+    const surname = String(formData.get("guestLastName") ?? "");
     startTransition(async () => {
       const result = await submitTransferRequest(hotelSlug, formData);
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      setSubmitted(true);
+      setSubmitted({ email, surname });
     });
   }
 
@@ -136,7 +158,7 @@ export function RequestForm({
           <Label htmlFor="date" required>
             {dict.date}
           </Label>
-          <Input id="date" name="date" type="date" required />
+          <Input id="date" name="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="time" required>
@@ -195,26 +217,21 @@ export function RequestForm({
             {modesForPoint.map((m) => {
               const modePrice =
                 isValidPriceTiers(m.priceTiers) ? computePrice(m.priceTiers as PriceTiers, pax, isNightService) : null;
-              const description = localizedText(
-                direction === "ARRIVO" ? m.descriptionArrival : m.descriptionDeparture,
-                locale,
-              );
+              const selected = m.id === selectedRouteId;
+              const description = selected
+                ? localizedText(direction === "ARRIVO" ? m.descriptionArrival : m.descriptionDeparture, locale)
+                : null;
               return (
                 <label
                   key={m.id}
                   className={`block cursor-pointer rounded-md border p-3 text-sm ${
-                    m.id === selectedRouteId ? "border-purple-600 ring-1 ring-purple-600" : "border-slate-200"
+                    selected ? "border-purple-600 ring-1 ring-purple-600" : "border-slate-200"
                   }`}
+                  onClick={() => setSelectedRouteId(m.id)}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <input
-                        type="radio"
-                        name="routeOptionRadio"
-                        className="mr-2"
-                        checked={m.id === selectedRouteId}
-                        onChange={() => setSelectedRouteId(m.id)}
-                      />
+                      <input type="radio" name="routeOptionRadio" className="mr-2" checked={selected} onChange={() => setSelectedRouteId(m.id)} />
                       <span className="font-medium text-slate-900">{m.transferMode ?? dict.modeStandardFallback}</span>
                       {m.durationMinutes && (
                         <span className="ml-2 text-xs text-slate-500">
@@ -247,23 +264,64 @@ export function RequestForm({
           <div className="mb-2 flex flex-wrap gap-3 text-sm text-slate-600">
             {ARRIVAL_MODES.map((mode) => (
               <label key={mode} className="flex items-center gap-1.5">
-                <input type="radio" checked={arrivalMode === mode} onChange={() => setArrivalMode(mode)} />
+                <input
+                  type="radio"
+                  checked={arrivalMode === mode}
+                  onChange={() => {
+                    setArrivalMode(mode);
+                    setFlightCheck(null);
+                  }}
+                />
                 {t(locale).arrivalMode[mode]}
               </label>
             ))}
           </div>
 
           {arrivalMode === "AEREO" && (
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <FieldGroup>
-                <Label htmlFor="flightOrTrainNumber">{dict.flightNumberLabel}</Label>
-                <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
-              </FieldGroup>
-              <FieldGroup>
-                <Label htmlFor="flightOrTrainOrigin">{dict.flightOriginLabel}</Label>
-                <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
-              </FieldGroup>
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                <FieldGroup>
+                  <Label htmlFor="flightOrTrainNumber">{dict.flightNumberLabel}</Label>
+                  <Input
+                    id="flightOrTrainNumber"
+                    name="flightOrTrainNumber"
+                    value={flightNumber}
+                    onChange={(e) => {
+                      setFlightNumber(e.target.value);
+                      setFlightCheck(null);
+                    }}
+                  />
+                </FieldGroup>
+                <FieldGroup>
+                  <Label htmlFor="flightOrTrainOrigin">{dict.flightOriginLabel}</Label>
+                  <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
+                </FieldGroup>
+              </div>
+              <div className="mb-4 -mt-2">
+                <Button type="button" variant="outline" size="sm" disabled={flightChecking} onClick={onCheckFlight}>
+                  {flightChecking ? dict.flightCheckChecking : dict.flightCheckButton}
+                </Button>
+                {flightCheck && (
+                  <p
+                    className={`mt-2 text-xs ${
+                      flightCheck.status === "ok" && !flightCheck.mismatch
+                        ? "text-emerald-600"
+                        : flightCheck.status === "not_configured"
+                          ? "text-slate-400"
+                          : "text-amber-600"
+                    }`}
+                  >
+                    {flightCheck.status === "not_configured" && dict.flightCheckNotConfigured}
+                    {flightCheck.status === "not_found" && dict.flightCheckNotFound}
+                    {flightCheck.status === "error" && dict.flightCheckNotConfigured}
+                    {flightCheck.status === "ok" &&
+                      (flightCheck.mismatch
+                        ? dict.flightCheckMismatch.replace("{time}", flightCheck.scheduledArrivalTime)
+                        : dict.flightCheckFound.replace("{time}", flightCheck.scheduledArrivalTime))}
+                  </p>
+                )}
+              </div>
+            </>
           )}
           {arrivalMode === "TRENO" && (
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
@@ -284,10 +342,7 @@ export function RequestForm({
             </FieldGroup>
           )}
           {(arrivalMode === "AUTO" || arrivalMode === "AUTOBUS") && (
-            <FieldGroup className="w-48">
-              <Label htmlFor="estimatedArrivalTime">{dict.estimatedArrivalTimeLabel}</Label>
-              <Input id="estimatedArrivalTime" name="estimatedArrivalTime" type="time" />
-            </FieldGroup>
+            <p className="mb-4 rounded-md bg-slate-50 p-3 text-xs text-slate-500">{dict.arrivalModeCarBusNote}</p>
           )}
         </FieldGroup>
       )}

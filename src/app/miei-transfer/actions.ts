@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { REQUEST_STATUS } from "@/lib/constants";
+import { toGuestStatusBucket, type GuestStatusBucket } from "@/lib/guest-status";
 
 const lookupSchema = z.object({
   email: z.string().trim().email(),
@@ -11,11 +12,19 @@ const lookupSchema = z.object({
 
 export type MyTransfer = {
   id: string;
-  status: string;
+  statusBucket: GuestStatusBucket;
   date: string;
   time: string;
   routeFrom: string;
   routeTo: string;
+  pax: number;
+  bagsCabin: number;
+  bagsStandard: number;
+  bagsLarge: number;
+  flightOrTrainNumber: string | null;
+  flightOrTrainOrigin: string | null;
+  notes: string | null;
+  price: number | null;
   guestTrackingToken: string;
 };
 
@@ -24,6 +33,16 @@ export type MyRequest = {
   status: string;
   date: string;
   time: string;
+  routeFrom: string;
+  routeTo: string;
+  pax: number;
+  bagsCabin: number;
+  bagsStandard: number;
+  bagsLarge: number;
+  flightOrTrainNumber: string | null;
+  flightOrTrainOrigin: string | null;
+  notes: string | null;
+  quotedPrice: number | null;
   rejectionReason: string | null;
 };
 
@@ -60,11 +79,19 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
     ok: true,
     transfers: transfers.map((t) => ({
       id: t.id,
-      status: t.status,
+      statusBucket: toGuestStatusBucket(t.status),
       date: t.date,
       time: t.time,
       routeFrom: t.routeFrom,
       routeTo: t.routeTo,
+      pax: t.pax,
+      bagsCabin: t.bagsCabin,
+      bagsStandard: t.bagsStandard,
+      bagsLarge: t.bagsLarge,
+      flightOrTrainNumber: t.flightOrTrainNumber,
+      flightOrTrainOrigin: t.flightOrTrainOrigin,
+      notes: t.notes,
+      price: t.price,
       guestTrackingToken: t.guestTrackingToken,
     })),
     requests: requests.map((r) => ({
@@ -72,6 +99,16 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
       status: r.status,
       date: r.date,
       time: r.time,
+      routeFrom: r.routeFrom,
+      routeTo: r.routeTo,
+      pax: r.pax,
+      bagsCabin: r.bagsCabin,
+      bagsStandard: r.bagsStandard,
+      bagsLarge: r.bagsLarge,
+      flightOrTrainNumber: r.flightOrTrainNumber,
+      flightOrTrainOrigin: r.flightOrTrainOrigin,
+      notes: r.notes,
+      quotedPrice: r.quotedPrice,
       rejectionReason: r.rejectionReason,
     })),
   };

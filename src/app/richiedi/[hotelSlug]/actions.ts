@@ -5,6 +5,7 @@ import { guestRequestSchema } from "@/lib/validations";
 import { computePrice, isValidPriceTiers } from "@/lib/pricing";
 import { notifyHotelStaff } from "@/lib/notifications";
 import { isNightTime } from "@/lib/night";
+import { lookupFlight, arrivalTimesDiffer } from "@/lib/flight-lookup";
 
 export type SubmitRequestResult = { ok: true } | { ok: false; error: string };
 
@@ -68,4 +69,24 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
   });
 
   return { ok: true };
+}
+
+export type FlightCheckResult =
+  | { status: "not_configured" }
+  | { status: "not_found" }
+  | { status: "error" }
+  | { status: "ok"; scheduledArrivalTime: string; mismatch: boolean };
+
+export async function checkFlight(flightNumber: string, date: string, enteredTime: string): Promise<FlightCheckResult> {
+  if (!flightNumber.trim() || !date) return { status: "error" };
+
+  const result = await lookupFlight(flightNumber.trim(), date);
+  if (result.status !== "found") return { status: result.status === "error" ? "error" : result.status };
+  if (!result.scheduledArrivalTime) return { status: "error" };
+
+  return {
+    status: "ok",
+    scheduledArrivalTime: result.scheduledArrivalTime,
+    mismatch: arrivalTimesDiffer(result.scheduledArrivalTime, enteredTime),
+  };
 }

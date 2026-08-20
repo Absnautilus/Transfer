@@ -118,6 +118,16 @@ In locale, se usi Supabase, aggiungi entrambe le variabili anche al tuo `.env` (
 
 Da quel momento l'app è raggiungibile all'URL assegnato da Vercel, con gli accessi demo sopra.
 
+## Verifica voli (facoltativa)
+
+Nel questionario, se l'ospite arriva in aereo può cliccare "Verifica volo" per controllare che il
+numero inserito esista e che l'orario coincida con quello del volo. Il collegamento è pronto in
+`src/lib/flight-lookup.ts` ma non è ancora attivo: senza `FLIGHT_LOOKUP_API_KEY` impostata,
+mostra semplicemente "verifica non ancora attiva" senza bloccare l'invio della richiesta. Per
+attivarla, scegli un provider (es. AeroDataBox su RapidAPI, ha un piano gratuito), imposta
+`FLIGHT_LOOKUP_API_KEY` nelle variabili d'ambiente e completa la chiamata API nel TODO indicato
+in quel file.
+
 ## Backup
 
 `GET /api/admin/backup` (protetto, solo amministratori) e `npm run db:backup` (standalone,
