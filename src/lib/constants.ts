@@ -65,6 +65,6 @@ export const ROLE_LABEL: Record<Role, string> = {
 export const ROLE_HOME: Record<Role, string> = {
   ADMIN: "/hotel/richieste",
   HOTEL_STAFF: "/hotel/richieste",
-  TAXI_STAFF: "/taxi/richieste",
+  TAXI_STAFF: "/taxi/transfer",
   DRIVER: "/driver",
 };
