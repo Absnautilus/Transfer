@@ -9,7 +9,7 @@ import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing"
 import { localizedText, type Locale } from "@/lib/i18n/locales";
 import { t } from "@/lib/i18n/dictionaries";
 import { isNightTime } from "@/lib/night";
-import { submitTransferRequest, checkFlight, type FlightCheckResult } from "./actions";
+import { submitTransferRequest } from "./actions";
 
 type Route = {
   id: string;
@@ -53,9 +53,6 @@ export function RequestForm({
   const [time, setTime] = useState("");
   const isNightService = isNightTime(time);
   const [arrivalMode, setArrivalMode] = useState<ArrivalMode>("AEREO");
-  const [flightNumber, setFlightNumber] = useState("");
-  const [flightCheck, setFlightCheck] = useState<FlightCheckResult | null>(null);
-  const [flightChecking, startFlightCheck] = useTransition();
 
   const price = useMemo(() => {
     if (!selectedRoute || !isValidPriceTiers(selectedRoute.priceTiers)) return null;
@@ -66,15 +63,6 @@ export function RequestForm({
     setSelectedPoint(point);
     const modes = routes.filter((r) => r.pointLabel === point);
     setSelectedRouteId(modes[0]?.id ?? "");
-  }
-
-  function onCheckFlight() {
-    if (!flightNumber.trim() || !date) return;
-    setFlightCheck(null);
-    startFlightCheck(async () => {
-      const result = await checkFlight(flightNumber, date, time);
-      setFlightCheck(result);
-    });
   }
 
   if (submitted) {
@@ -264,64 +252,23 @@ export function RequestForm({
           <div className="mb-2 flex flex-wrap gap-3 text-sm text-slate-600">
             {ARRIVAL_MODES.map((mode) => (
               <label key={mode} className="flex items-center gap-1.5">
-                <input
-                  type="radio"
-                  checked={arrivalMode === mode}
-                  onChange={() => {
-                    setArrivalMode(mode);
-                    setFlightCheck(null);
-                  }}
-                />
+                <input type="radio" checked={arrivalMode === mode} onChange={() => setArrivalMode(mode)} />
                 {t(locale).arrivalMode[mode]}
               </label>
             ))}
           </div>
 
           {arrivalMode === "AEREO" && (
-            <>
-              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <FieldGroup>
-                  <Label htmlFor="flightOrTrainNumber">{dict.flightNumberLabel}</Label>
-                  <Input
-                    id="flightOrTrainNumber"
-                    name="flightOrTrainNumber"
-                    value={flightNumber}
-                    onChange={(e) => {
-                      setFlightNumber(e.target.value);
-                      setFlightCheck(null);
-                    }}
-                  />
-                </FieldGroup>
-                <FieldGroup>
-                  <Label htmlFor="flightOrTrainOrigin">{dict.flightOriginLabel}</Label>
-                  <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
-                </FieldGroup>
-              </div>
-              <div className="mb-4 -mt-2">
-                <Button type="button" variant="outline" size="sm" disabled={flightChecking} onClick={onCheckFlight}>
-                  {flightChecking ? dict.flightCheckChecking : dict.flightCheckButton}
-                </Button>
-                {flightCheck && (
-                  <p
-                    className={`mt-2 text-xs ${
-                      flightCheck.status === "ok" && !flightCheck.mismatch
-                        ? "text-emerald-600"
-                        : flightCheck.status === "not_configured"
-                          ? "text-slate-400"
-                          : "text-amber-600"
-                    }`}
-                  >
-                    {flightCheck.status === "not_configured" && dict.flightCheckNotConfigured}
-                    {flightCheck.status === "not_found" && dict.flightCheckNotFound}
-                    {flightCheck.status === "error" && dict.flightCheckNotConfigured}
-                    {flightCheck.status === "ok" &&
-                      (flightCheck.mismatch
-                        ? dict.flightCheckMismatch.replace("{time}", flightCheck.scheduledArrivalTime)
-                        : dict.flightCheckFound.replace("{time}", flightCheck.scheduledArrivalTime))}
-                  </p>
-                )}
-              </div>
-            </>
+            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainNumber">{dict.flightNumberLabel}</Label>
+                <Input id="flightOrTrainNumber" name="flightOrTrainNumber" />
+              </FieldGroup>
+              <FieldGroup>
+                <Label htmlFor="flightOrTrainOrigin">{dict.flightOriginLabel}</Label>
+                <Input id="flightOrTrainOrigin" name="flightOrTrainOrigin" />
+              </FieldGroup>
+            </div>
           )}
           {arrivalMode === "TRENO" && (
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">

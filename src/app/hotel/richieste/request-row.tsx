@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { acceptRequest, rejectRequest } from "./actions";
 import { formatBags } from "@/lib/bags";
+import { FlightCheckButton } from "@/components/flight-check-button";
 
 type Request = {
   id: string;
@@ -24,6 +25,7 @@ type Request = {
   routeFrom: string;
   routeTo: string;
   quotedPrice: number | null;
+  arrivalMode: string | null;
   flightOrTrainNumber: string | null;
   flightOrTrainOrigin: string | null;
   notes: string | null;
@@ -108,6 +110,9 @@ export function RequestRow({ request }: { request: Request }) {
             <dd>
               {request.flightOrTrainNumber} {request.flightOrTrainOrigin && `da ${request.flightOrTrainOrigin}`}
             </dd>
+            {request.arrivalMode === "AEREO" && request.flightOrTrainNumber && (
+              <FlightCheckButton flightNumber={request.flightOrTrainNumber} date={request.date} time={request.time} />
+            )}
           </div>
         )}
         {request.notes && (

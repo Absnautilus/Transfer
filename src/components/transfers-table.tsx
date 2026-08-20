@@ -1,6 +1,7 @@
 import { StatusBadge } from "@/components/ui/badge";
 import { TaxiRowActions } from "@/components/taxi-row-actions";
 import { HotelRowActions } from "@/components/hotel-row-actions";
+import { FlightCheckButton } from "@/components/flight-check-button";
 import { TRIP_EVENT_LABEL, type TripEvent } from "@/lib/constants";
 
 type Transfer = {
@@ -16,6 +17,7 @@ type Transfer = {
   bags: string | null;
   routeFrom: string;
   routeTo: string;
+  arrivalMode?: string | null;
   flightOrTrainNumber: string | null;
   flightOrTrainOrigin: string | null;
   status: string;
@@ -89,6 +91,9 @@ export function TransfersTable({
               <td className="px-3 py-3 text-slate-600">
                 {t.flightOrTrainNumber || "—"}
                 {t.flightOrTrainOrigin && <div className="text-xs text-slate-400">{t.flightOrTrainOrigin}</div>}
+                {t.arrivalMode === "AEREO" && t.flightOrTrainNumber && (
+                  <FlightCheckButton flightNumber={t.flightOrTrainNumber} date={t.date} time={t.time} />
+                )}
               </td>
               <td className="px-3 py-3">
                 <StatusBadge status={t.status} />

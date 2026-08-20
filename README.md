@@ -120,12 +120,14 @@ Da quel momento l'app è raggiungibile all'URL assegnato da Vercel, con gli acce
 
 ## Verifica voli (facoltativa)
 
-Nel questionario, se l'ospite arriva in aereo può cliccare "Verifica volo" per controllare che il
-numero inserito esista e che l'orario coincida con quello del volo. Il collegamento è pronto in
-`src/lib/flight-lookup.ts` ma non è ancora attivo: senza `FLIGHT_LOOKUP_API_KEY` impostata,
-mostra semplicemente "verifica non ancora attiva" senza bloccare l'invio della richiesta. Per
-attivarla, scegli un provider (es. AeroDataBox su RapidAPI, ha un piano gratuito), imposta
-`FLIGHT_LOOKUP_API_KEY` nelle variabili d'ambiente e completa la chiamata API nel TODO indicato
+Solo lato operatore, non nel questionario ospite: nella pagina Richieste dell'hotel e nella
+tabella Transfer confermati, quando l'arrivo è in aereo compare un link "Verifica volo" che
+controlla che il numero esista e che l'orario coincida con quello del volo. Il collegamento è
+pronto in `src/lib/flight-lookup.ts` (chiamato da `src/lib/check-flight-action.ts`) ma non è
+ancora attivo: senza `FLIGHT_LOOKUP_API_KEY` impostata, mostra semplicemente "verifica non
+ancora attiva". Per attivarla, scegli un provider (es. AeroDataBox su RapidAPI, ha un piano
+gratuito), imposta `FLIGHT_LOOKUP_API_KEY` nelle variabili d'ambiente e completa la chiamata API
+nel TODO indicato
 in quel file.
 
 ## Backup
