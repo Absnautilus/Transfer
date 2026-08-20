@@ -28,7 +28,7 @@ export async function sendMail(options: { to: string; subject: string; html: str
   if (client) {
     try {
       await client.sendMail({
-        from: process.env.SMTP_FROM ?? "Hotel Transfer <no-reply@hoteltransfer.local>",
+        from: process.env.SMTP_FROM ?? "FromTo <no-reply@fromto.local>",
         to,
         subject,
         html,

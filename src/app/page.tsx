@@ -17,9 +17,9 @@ export default async function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-16">
       <div className="w-full max-w-3xl text-center">
         <LogoMark className="mx-auto h-12 w-12" />
-        <p className="mt-3 text-sm font-medium uppercase tracking-wide text-purple-600">Hotel Transfer</p>
+        <p className="mt-3 text-sm font-medium uppercase tracking-wide text-purple-600">FromTo</p>
         <h1 className="mt-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
-          Gestione automatizzata dei transfer organizzati dall&apos;hotel
+          Just choose your transfer, we take care of the rest.
         </h1>
         <p className="mt-4 text-slate-600">
           Richieste ospiti, verifica dell&apos;operatore hotel, conferma della compagnia taxi, assegnazione autisti e stato del

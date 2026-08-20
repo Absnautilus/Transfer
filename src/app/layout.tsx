@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hotel Transfer",
-  description: "Gestione automatizzata dei transfer organizzati dall'hotel",
+  title: "FromTo",
+  description: "Just choose your transfer, we take care of the rest.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
