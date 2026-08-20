@@ -41,6 +41,7 @@ export async function submitTransferRequest(hotelSlug: string, formData: FormDat
       roomNumber: data.roomNumber || null,
       bookingNumber: data.bookingNumber || null,
       pax: data.pax,
+      bagsPersonal: data.bagsPersonal,
       bagsCabin: data.bagsCabin,
       bagsStandard: data.bagsStandard,
       bagsLarge: data.bagsLarge,

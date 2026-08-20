@@ -18,6 +18,7 @@ export type MyTransfer = {
   routeFrom: string;
   routeTo: string;
   pax: number;
+  bagsPersonal: number;
   bagsCabin: number;
   bagsStandard: number;
   bagsLarge: number;
@@ -36,6 +37,7 @@ export type MyRequest = {
   routeFrom: string;
   routeTo: string;
   pax: number;
+  bagsPersonal: number;
   bagsCabin: number;
   bagsStandard: number;
   bagsLarge: number;
@@ -85,6 +87,7 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
       routeFrom: t.routeFrom,
       routeTo: t.routeTo,
       pax: t.pax,
+      bagsPersonal: t.bagsPersonal,
       bagsCabin: t.bagsCabin,
       bagsStandard: t.bagsStandard,
       bagsLarge: t.bagsLarge,
@@ -102,6 +105,7 @@ export async function lookupMyTransfers(formData: FormData): Promise<LookupResul
       routeFrom: r.routeFrom,
       routeTo: r.routeTo,
       pax: r.pax,
+      bagsPersonal: r.bagsPersonal,
       bagsCabin: r.bagsCabin,
       bagsStandard: r.bagsStandard,
       bagsLarge: r.bagsLarge,

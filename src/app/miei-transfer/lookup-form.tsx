@@ -13,6 +13,7 @@ type Dict = (typeof dictionaries)["it"];
 
 function DetailRow({
   pax,
+  bagsPersonal,
   bagsCabin,
   bagsStandard,
   bagsLarge,
@@ -23,6 +24,7 @@ function DetailRow({
   dict,
 }: {
   pax: number;
+  bagsPersonal: number;
   bagsCabin: number;
   bagsStandard: number;
   bagsLarge: number;
@@ -32,7 +34,7 @@ function DetailRow({
   price: number | null;
   dict: Dict;
 }) {
-  const totalBags = bagsCabin + bagsStandard + bagsLarge;
+  const totalBags = bagsPersonal + bagsCabin + bagsStandard + bagsLarge;
   return (
     <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 border-t border-slate-100 pt-3 text-sm text-slate-600 sm:grid-cols-4">
       <div>
@@ -147,6 +149,7 @@ export function LookupForm({ dict }: { dict: Dict }) {
               </div>
               <DetailRow
                 pax={t.pax}
+                bagsPersonal={t.bagsPersonal}
                 bagsCabin={t.bagsCabin}
                 bagsStandard={t.bagsStandard}
                 bagsLarge={t.bagsLarge}
@@ -176,6 +179,7 @@ export function LookupForm({ dict }: { dict: Dict }) {
               </div>
               <DetailRow
                 pax={r.pax}
+                bagsPersonal={r.bagsPersonal}
                 bagsCabin={r.bagsCabin}
                 bagsStandard={r.bagsStandard}
                 bagsLarge={r.bagsLarge}

@@ -158,6 +158,7 @@ model TransferRequest {
   roomNumber     String?
   bookingNumber  String?
   pax            Int
+  bagsPersonal   Int     @default(0)
   bagsCabin      Int     @default(0)
   bagsStandard   Int     @default(0)
   bagsLarge      Int     @default(0)
@@ -218,7 +219,8 @@ model Transfer {
   roomNumber     String?
   bookingNumber  String?
   pax            Int
-  bags           String? // legacy free-text summary, kept for CSV imports; see bagsCabin/Standard/Large
+  bags           String? // legacy free-text summary, kept for CSV imports; see bagsPersonal/Cabin/Standard/Large
+  bagsPersonal   Int     @default(0)
   bagsCabin      Int     @default(0)
   bagsStandard   Int     @default(0)
   bagsLarge      Int     @default(0)

@@ -168,7 +168,9 @@ export function RequestForm({
       </div>
 
       <FieldGroup>
-        <BagsInput />
+        <BagsInput
+          labels={{ personal: dict.bagsPersonal, cabin: dict.bagsCabin, standard: dict.bagsStandard, large: dict.bagsLarge }}
+        />
       </FieldGroup>
 
       <FieldGroup>

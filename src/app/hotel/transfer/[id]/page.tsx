@@ -36,6 +36,7 @@ export default async function EditTransferPage({ params }: { params: Promise<{ i
               roomNumber: transfer.roomNumber,
               bookingNumber: transfer.bookingNumber,
               pax: transfer.pax,
+              bagsPersonal: transfer.bagsPersonal,
               bagsCabin: transfer.bagsCabin,
               bagsStandard: transfer.bagsStandard,
               bagsLarge: transfer.bagsLarge,

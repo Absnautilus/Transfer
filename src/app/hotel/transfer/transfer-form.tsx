@@ -17,6 +17,7 @@ export type TransferFormValues = {
   roomNumber?: string | null;
   bookingNumber?: string | null;
   pax: number;
+  bagsPersonal?: number;
   bagsCabin?: number;
   bagsStandard?: number;
   bagsLarge?: number;
@@ -84,16 +85,16 @@ export function TransferForm({
           <Input id="roomNumber" name="roomNumber" defaultValue={initial?.roomNumber ?? ""} />
         </FieldGroup>
         <FieldGroup>
+          <Label htmlFor="bookingNumber">Numero prenotazione</Label>
+          <Input id="bookingNumber" name="bookingNumber" defaultValue={initial?.bookingNumber ?? ""} />
+        </FieldGroup>
+        <FieldGroup>
           <Label htmlFor="guestEmail">Email</Label>
           <Input id="guestEmail" name="guestEmail" type="email" defaultValue={initial?.guestEmail ?? ""} />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="guestPhone">Telefono</Label>
           <Input id="guestPhone" name="guestPhone" defaultValue={initial?.guestPhone ?? ""} />
-        </FieldGroup>
-        <FieldGroup>
-          <Label htmlFor="bookingNumber">Numero prenotazione</Label>
-          <Input id="bookingNumber" name="bookingNumber" defaultValue={initial?.bookingNumber ?? ""} />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="pax" required>
@@ -141,7 +142,7 @@ export function TransferForm({
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="price">Tariffa (€)</Label>
-          <Input id="price" name="price" type="number" step="0.01" defaultValue={initial?.price ?? ""} />
+          <Input id="price" name="price" type="number" min={0} step="0.01" defaultValue={initial?.price ?? ""} />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="priceAdjustmentType">Sconto / Maggiorazione</Label>
@@ -167,7 +168,12 @@ export function TransferForm({
       </div>
 
       <FieldGroup>
-        <BagsInput cabinDefault={initial?.bagsCabin ?? 0} standardDefault={initial?.bagsStandard ?? 0} largeDefault={initial?.bagsLarge ?? 0} />
+        <BagsInput
+          personalDefault={initial?.bagsPersonal ?? 0}
+          cabinDefault={initial?.bagsCabin ?? 0}
+          standardDefault={initial?.bagsStandard ?? 0}
+          largeDefault={initial?.bagsLarge ?? 0}
+        />
       </FieldGroup>
 
       <FieldGroup>

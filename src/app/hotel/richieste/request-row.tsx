@@ -16,6 +16,7 @@ type Request = {
   roomNumber: string | null;
   bookingNumber: string | null;
   pax: number;
+  bagsPersonal: number;
   bagsCabin: number;
   bagsStandard: number;
   bagsLarge: number;
@@ -38,7 +39,7 @@ export function RequestRow({ request }: { request: Request }) {
   const [error, setError] = useState<string | null>(null);
 
   const route = `${request.routeFrom} → ${request.routeTo}`;
-  const bags = formatBags(request.bagsCabin, request.bagsStandard, request.bagsLarge);
+  const bags = formatBags(request.bagsPersonal, request.bagsCabin, request.bagsStandard, request.bagsLarge);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">

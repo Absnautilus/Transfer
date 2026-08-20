@@ -8,6 +8,7 @@ export const guestRequestSchema = z.object({
   roomNumber: z.string().trim().optional(),
   bookingNumber: z.string().trim().optional(),
   pax: z.coerce.number().int().min(1, "Almeno 1 passeggero").max(50),
+  bagsPersonal: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsCabin: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsStandard: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsLarge: z.coerce.number().int().min(0).max(20).optional().default(0),
@@ -39,6 +40,7 @@ export const manualTransferSchema = z.object({
   roomNumber: z.string().trim().optional(),
   bookingNumber: z.string().trim().optional(),
   pax: z.coerce.number().int().min(1).max(50),
+  bagsPersonal: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsCabin: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsStandard: z.coerce.number().int().min(0).max(20).optional().default(0),
   bagsLarge: z.coerce.number().int().min(0).max(20).optional().default(0),
@@ -49,7 +51,7 @@ export const manualTransferSchema = z.object({
   flightOrTrainNumber: z.string().trim().optional(),
   flightOrTrainOrigin: z.string().trim().optional(),
   notes: z.string().trim().optional(),
-  price: z.coerce.number().optional(),
+  price: z.coerce.number().min(0, "La tariffa non può essere negativa").optional(),
   priceAdjustmentType: z.enum(["NONE", "DISCOUNT", "SURCHARGE"]).optional().default("NONE"),
   priceAdjustmentAmount: z.coerce.number().min(0).optional(),
 });
@@ -83,4 +85,13 @@ export const createAdminUserSchema = z.object({
   name: z.string().trim().min(2, "Indica il nome"),
   email: z.string().trim().email(),
   password: z.string().min(6, "La password deve avere almeno 6 caratteri"),
+});
+
+export const createOperatorSchema = z.object({
+  orgType: z.enum(["HOTEL", "TAXI"], { message: "Seleziona il tipo di organizzazione" }),
+  orgId: z.string().trim().min(1, "Seleziona l'organizzazione"),
+  name: z.string().trim().min(2, "Indica il nome"),
+  email: z.string().trim().email(),
+  password: z.string().min(6, "La password deve avere almeno 6 caratteri"),
+  isOrgAdmin: z.coerce.boolean().optional().default(false),
 });
