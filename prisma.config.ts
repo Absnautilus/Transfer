@@ -10,6 +10,10 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Migrations run against the direct (non-pooled) connection when one is
+    // provided — needed for poolers like Supabase's PgBouncer in transaction
+    // mode, which the schema/migration engine can't run DDL through. Plain
+    // setups (local Postgres, Neon, Vercel Postgres) only need DATABASE_URL.
+    url: process.env["DIRECT_URL"] ?? process.env["DATABASE_URL"],
   },
 });

@@ -66,20 +66,45 @@ locale/di sviluppo, mai con quello di produzione. Nessun dato reale di ospiti è
 
 ## Deploy su Vercel
 
+Il database può essere quello proposto direttamente da Vercel (Neon) oppure un progetto
+Supabase a parte — l'app usa Postgres standard via `@prisma/adapter-pg`, funziona con entrambi
+senza toccare il codice.
+
+### Opzione A — Postgres integrato di Vercel (Neon)
+
 1. Su [vercel.com](https://vercel.com) → **Add New → Project** → importa questo repo GitHub,
    branch `claude/hotel-transfer-automation-app-bgrpzz` (o `main` dopo il merge).
-2. Nel progetto Vercel: **Storage → Create Database → Postgres** (Neon, incluso gratis) e
-   collegalo al progetto — questo imposta automaticamente `DATABASE_URL`.
+2. Nel progetto Vercel: **Storage → Create Database → Postgres** e collegalo al progetto —
+   imposta automaticamente `DATABASE_URL`.
 3. In **Settings → Environment Variables** aggiungi:
    - `AUTH_SECRET` — genera con `openssl rand -base64 32`
    - `APP_URL` — l'URL che Vercel assegna al progetto (es. `https://tuo-progetto.vercel.app`)
 4. In **Settings → Build & Development**, imposta il **Build Command** su:
-   `prisma migrate deploy && next build`
-   (crea le tabelle sul database ad ogni deploy).
+   `prisma migrate deploy && next build` (crea le tabelle ad ogni deploy).
 5. Fai il primo **Deploy**.
-6. Per popolare i dati demo la prima volta, da locale con `DATABASE_URL` puntato al database
-   Vercel/Neon appena creato (copialo da Storage → `.env.local` tab su Vercel):
-   `npm run db:seed`
+6. Per popolare i dati demo, da locale con `DATABASE_URL` puntato allo stesso database
+   (copialo da Storage → tab `.env.local` su Vercel): `npm run db:seed`
+
+### Opzione B — Database su Supabase
+
+1. Su [supabase.com](https://supabase.com) crea un nuovo progetto (gratis) e imposta una
+   password del database.
+2. In **Project Settings → Database → Connection string** trovi due stringhe:
+   - **Transaction pooler** (porta `6543`) → usala come `DATABASE_URL`
+   - **Direct connection** (porta `5432`) → usala come `DIRECT_URL`
+
+   Servono entrambe: `DATABASE_URL` (pooled) è quella che usa l'app in produzione — importante
+   su Vercel perché le funzioni serverless aprono molte connessioni brevi, e senza pooler un
+   database Postgres normale le esaurisce in fretta; `DIRECT_URL` serve solo alle migrazioni
+   (`prisma migrate`), che sulla connessione in pool non funzionano.
+3. Su Vercel, importa il repo come sopra e in **Settings → Environment Variables** imposta
+   `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, `APP_URL`.
+4. Build command: `prisma migrate deploy && next build`.
+5. Deploy, poi `npm run db:seed` da locale (con `DATABASE_URL`/`DIRECT_URL` puntati a Supabase)
+   per i dati demo.
+
+In locale, se usi Supabase, aggiungi entrambe le variabili anche al tuo `.env` (vedi
+`.env.example`); con un Postgres locale/Neon/Vercel Postgres, `DIRECT_URL` non serve.
 
 Da quel momento l'app è raggiungibile all'URL assegnato da Vercel, con gli accessi demo sopra.
 
