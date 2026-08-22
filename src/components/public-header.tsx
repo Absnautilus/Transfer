@@ -9,7 +9,12 @@ export function PublicHeader({ locale }: { locale?: Locale }) {
       <Link href="/" className="hover:opacity-80">
         <Logo />
       </Link>
-      {locale && <LanguageSwitcher locale={locale} />}
+      <div className="flex items-center gap-4">
+        {locale && <LanguageSwitcher locale={locale} />}
+        <Link href="/login" className="text-sm text-slate-400 hover:text-slate-600">
+          Sei un operatore?
+        </Link>
+      </div>
     </div>
   );
 }
