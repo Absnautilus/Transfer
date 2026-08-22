@@ -10,22 +10,36 @@ import { todayISO } from "@/lib/date";
 export function TransfersToolbar({ basePath }: { basePath: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const date = searchParams.get("date") ?? todayISO();
+  const explicitDate = searchParams.get("date");
+  const isUpcoming = !explicitDate && !searchParams.get("q");
+  const date = explicitDate ?? todayISO();
   const [q, setQ] = useState(searchParams.get("q") ?? "");
 
   function goTo(nextDate: string) {
     router.push(`${basePath}?date=${nextDate}`);
   }
 
+  function goToUpcoming() {
+    setQ("");
+    router.push(basePath);
+  }
+
   function onSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (q.trim()) router.push(`${basePath}?q=${encodeURIComponent(q.trim())}`);
-    else router.push(`${basePath}?date=${date}`);
+    else goToUpcoming();
   }
 
   return (
     <div className="mb-4 flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-1">
+        <Button
+          variant={isUpcoming ? "secondary" : "ghost"}
+          size="sm"
+          onClick={goToUpcoming}
+        >
+          Prossimi
+        </Button>
         <Button variant="outline" size="sm" onClick={() => goTo(format(addDays(parseISO(date), -1), "yyyy-MM-dd"))}>
           ← Ieri
         </Button>
@@ -33,7 +47,7 @@ export function TransfersToolbar({ basePath }: { basePath: string }) {
         <Button variant="outline" size="sm" onClick={() => goTo(format(addDays(parseISO(date), 1), "yyyy-MM-dd"))}>
           Domani →
         </Button>
-        <Button variant="ghost" size="sm" onClick={() => goTo(todayISO())}>
+        <Button variant={!isUpcoming && date === todayISO() ? "secondary" : "ghost"} size="sm" onClick={() => goTo(todayISO())}>
           Oggi
         </Button>
       </div>
@@ -48,15 +62,7 @@ export function TransfersToolbar({ basePath }: { basePath: string }) {
           Cerca
         </Button>
         {searchParams.get("q") && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setQ("");
-              goTo(todayISO());
-            }}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={goToUpcoming}>
             Reset
           </Button>
         )}

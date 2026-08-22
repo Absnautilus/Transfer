@@ -16,8 +16,13 @@ export async function getTransfers(scope: { hotelId?: string; taxiCompanyId?: st
       { bookingNumber: { contains: q } },
       { roomNumber: { contains: q } },
     ];
+  } else if (filters.date) {
+    where.date = filters.date;
   } else {
-    where.date = filters.date ?? todayISO();
+    // No explicit date picked: show everything from today onward instead of
+    // just today, so a transfer confirmed for a future date (the common
+    // case) doesn't silently disappear from the default view.
+    where.date = { gte: todayISO() };
   }
 
   return prisma.transfer.findMany({

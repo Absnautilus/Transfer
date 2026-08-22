@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireHotelUser } from "@/lib/session";
 import { REQUEST_STATUS } from "@/lib/constants";
@@ -58,6 +59,7 @@ export default async function HotelRequestsPage() {
                   <th className="px-4 py-2">Data</th>
                   <th className="px-4 py-2">Esito</th>
                   <th className="px-4 py-2">Motivo</th>
+                  <th className="px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -77,6 +79,13 @@ export default async function HotelRequestsPage() {
                       )}
                     </td>
                     <td className="px-4 py-2 text-slate-500">{r.rejectionReason ?? "—"}</td>
+                    <td className="px-4 py-2">
+                      {r.status === REQUEST_STATUS.ACCEPTED && (
+                        <Link href={`/hotel/transfer?date=${r.date}`} className="text-purple-600 hover:underline">
+                          Vedi transfer
+                        </Link>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
