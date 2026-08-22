@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { acceptRequest, rejectRequest } from "./actions";
@@ -9,6 +10,7 @@ import { FlightCheckButton } from "@/components/flight-check-button";
 
 type Request = {
   id: string;
+  status?: string;
   guestFirstName: string;
   guestLastName: string;
   guestEmail: string;
@@ -30,10 +32,11 @@ type Request = {
   flightOrTrainNumber: string | null;
   flightOrTrainOrigin: string | null;
   notes: string | null;
+  rejectionReason?: string | null;
   createdAt: string;
 };
 
-export function RequestRow({ request }: { request: Request }) {
+export function RequestRow({ request, mode = "pending" }: { request: Request; mode?: "pending" | "accepted" | "rejected" }) {
   const [showReject, setShowReject] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -52,28 +55,39 @@ export function RequestRow({ request }: { request: Request }) {
             {request.date} · {request.time} {request.isNightService && <span className="text-purple-600">(notturno)</span>}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={pending}
-            onClick={() =>
-              startTransition(async () => {
-                setError(null);
-                try {
-                  await acceptRequest(request.id);
-                } catch (e) {
-                  setError(e instanceof Error ? e.message : "Errore");
-                }
-              })
-            }
-          >
-            Accetta
-          </Button>
-          <Button size="sm" variant="danger" disabled={pending} onClick={() => setShowReject((v) => !v)}>
-            Rifiuta
-          </Button>
-        </div>
+        {mode === "pending" ? (
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  setError(null);
+                  try {
+                    await acceptRequest(request.id);
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Errore");
+                  }
+                })
+              }
+            >
+              Accetta
+            </Button>
+            <Button size="sm" variant="danger" disabled={pending} onClick={() => setShowReject((v) => !v)}>
+              Rifiuta
+            </Button>
+          </div>
+        ) : mode === "accepted" ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-emerald-600">Accettata</span>
+            <Link href={`/hotel/transfer?date=${request.date}`} className="text-sm text-purple-600 hover:underline">
+              Vedi transfer
+            </Link>
+          </div>
+        ) : (
+          <span className="text-sm font-medium text-red-600">Rifiutata</span>
+        )}
       </div>
 
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-slate-600 sm:grid-cols-4">
@@ -120,6 +134,12 @@ export function RequestRow({ request }: { request: Request }) {
           <div className="col-span-2 sm:col-span-4">
             <dt className="text-slate-400">Note</dt>
             <dd>{request.notes}</dd>
+          </div>
+        )}
+        {mode === "rejected" && request.rejectionReason && (
+          <div className="col-span-2 sm:col-span-4">
+            <dt className="text-slate-400">Motivo del rifiuto</dt>
+            <dd className="text-red-600">{request.rejectionReason}</dd>
           </div>
         )}
       </dl>

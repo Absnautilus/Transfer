@@ -5,92 +5,80 @@ import { REQUEST_STATUS } from "@/lib/constants";
 import { RequestRow } from "./request-row";
 import { Badge } from "@/components/ui/badge";
 
-export default async function HotelRequestsPage() {
-  const user = await requireHotelUser();
+const TABS = [
+  { key: "pending", label: "In attesa", status: REQUEST_STATUS.PENDING },
+  { key: "accepted", label: "Accettate", status: REQUEST_STATUS.ACCEPTED },
+  { key: "rejected", label: "Rifiutate", status: REQUEST_STATUS.REJECTED },
+] as const;
 
-  const [pending, recent] = await Promise.all([
+type TabKey = (typeof TABS)[number]["key"];
+
+export default async function HotelRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
+  const user = await requireHotelUser();
+  const { tab } = await searchParams;
+  const activeTab: TabKey = TABS.some((t) => t.key === tab) ? (tab as TabKey) : "pending";
+  const activeStatus = TABS.find((t) => t.key === activeTab)!.status;
+
+  const [requests, counts] = await Promise.all([
     prisma.transferRequest.findMany({
-      where: { hotelId: user.hotelId, status: REQUEST_STATUS.PENDING },
-      orderBy: { createdAt: "asc" },
+      where: { hotelId: user.hotelId, status: activeStatus },
+      orderBy: activeTab === "pending" ? { createdAt: "asc" } : { reviewedAt: "desc" },
     }),
-    prisma.transferRequest.findMany({
-      where: { hotelId: user.hotelId, status: { not: REQUEST_STATUS.PENDING } },
-      orderBy: { reviewedAt: "desc" },
-      take: 8,
+    prisma.transferRequest.groupBy({
+      by: ["status"],
+      where: { hotelId: user.hotelId },
+      _count: { _all: true },
     }),
   ]);
 
+  const countFor = (status: string) => counts.find((c) => c.status === status)?._count._all ?? 0;
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900">Richieste di transfer</h1>
-          <p className="text-sm text-slate-500">Verifica e conferma le richieste inviate dagli ospiti tramite il questionario.</p>
-        </div>
-        <Badge>{pending.length} in attesa</Badge>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-slate-900">Richieste di transfer</h1>
+        <p className="text-sm text-slate-500">Verifica e conferma le richieste inviate dagli ospiti tramite il questionario.</p>
       </div>
 
-      {pending.length === 0 ? (
+      <div className="mb-6 flex flex-wrap items-center gap-2 border-b border-slate-200">
+        {TABS.map((t) => {
+          const count = countFor(t.status);
+          const isActive = t.key === activeTab;
+          return (
+            <Link
+              key={t.key}
+              href={`/hotel/richieste?tab=${t.key}`}
+              className={`flex items-center gap-2 border-b-2 px-3 py-2 text-sm font-medium ${
+                isActive ? "border-purple-600 text-purple-700" : "border-transparent text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              {t.label}
+              <Badge className={isActive ? "bg-purple-100 text-purple-800" : "bg-slate-100 text-slate-600"}>{count}</Badge>
+            </Link>
+          );
+        })}
+      </div>
+
+      {requests.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-          Nessuna richiesta in attesa al momento.
+          Nessuna richiesta {activeTab === "pending" ? "in attesa" : activeTab === "accepted" ? "accettata" : "rifiutata"} al momento.
         </div>
       ) : (
         <div className="space-y-3">
-          {pending.map((request) => (
+          {requests.map((request) => (
             <RequestRow
               key={request.id}
+              mode={activeTab}
               request={{
                 ...request,
                 createdAt: request.createdAt.toISOString(),
               }}
             />
           ))}
-        </div>
-      )}
-
-      {recent.length > 0 && (
-        <div className="mt-10">
-          <h2 className="mb-3 text-sm font-semibold text-slate-500">Richieste recenti</h2>
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase text-slate-400">
-                <tr>
-                  <th className="px-4 py-2">Ospite</th>
-                  <th className="px-4 py-2">Data</th>
-                  <th className="px-4 py-2">Esito</th>
-                  <th className="px-4 py-2">Motivo</th>
-                  <th className="px-4 py-2"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {recent.map((r) => (
-                  <tr key={r.id}>
-                    <td className="px-4 py-2">
-                      {r.guestFirstName} {r.guestLastName}
-                    </td>
-                    <td className="px-4 py-2">
-                      {r.date} {r.time}
-                    </td>
-                    <td className="px-4 py-2">
-                      {r.status === REQUEST_STATUS.ACCEPTED ? (
-                        <span className="text-emerald-600">Accettata</span>
-                      ) : (
-                        <span className="text-red-600">Rifiutata</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-slate-500">{r.rejectionReason ?? "—"}</td>
-                    <td className="px-4 py-2">
-                      {r.status === REQUEST_STATUS.ACCEPTED && (
-                        <Link href={`/hotel/transfer?date=${r.date}`} className="text-purple-600 hover:underline">
-                          Vedi transfer
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       )}
     </div>
