@@ -66,9 +66,9 @@ export function OperatorForm({ hotels, taxiCompanies }: { hotels: Org[]; taxiCom
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="email" required>
-            Email di accesso
+            Nome utente (o email)
           </Label>
-          <Input id="email" name="email" type="email" required />
+          <Input id="email" name="email" type="text" required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="password" required>

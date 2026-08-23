@@ -91,7 +91,13 @@ export const createOperatorSchema = z.object({
   orgType: z.enum(["HOTEL", "TAXI"], { message: "Seleziona il tipo di organizzazione" }),
   orgId: z.string().trim().min(1, "Seleziona l'organizzazione"),
   name: z.string().trim().min(2, "Indica il nome"),
-  email: z.string().trim().email(),
+  // Not required to be a real email: just a unique login identifier. Admins
+  // can enter a plain username now, or a real email later — same field.
+  email: z
+    .string()
+    .trim()
+    .min(3, "Indica un nome utente di almeno 3 caratteri")
+    .regex(/^\S+$/, "Il nome utente non può contenere spazi"),
   password: z.string().min(6, "La password deve avere almeno 6 caratteri"),
   isOrgAdmin: z.coerce.boolean().optional().default(false),
 });

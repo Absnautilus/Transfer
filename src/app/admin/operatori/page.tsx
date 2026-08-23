@@ -35,7 +35,7 @@ export default async function AdminOperatorsPage() {
           <thead className="bg-slate-50 text-left text-xs uppercase text-slate-400">
             <tr>
               <th className="px-4 py-2">Nome</th>
-              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Nome utente</th>
               <th className="px-4 py-2">Ruolo</th>
               <th className="px-4 py-2">Organizzazione</th>
               <th className="px-4 py-2">Admin</th>

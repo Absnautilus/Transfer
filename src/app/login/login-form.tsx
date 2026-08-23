@@ -33,9 +33,9 @@ export function LoginForm() {
     <form onSubmit={onSubmit}>
       <FieldGroup>
         <Label htmlFor="email" required>
-          Email
+          Nome utente o email
         </Label>
-        <Input id="email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <Input id="email" type="text" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
       </FieldGroup>
       <FieldGroup>
         <Label htmlFor="password" required>
