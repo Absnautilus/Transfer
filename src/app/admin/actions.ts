@@ -3,9 +3,34 @@
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { requireAdmin } from "@/lib/session";
 import { ROLES } from "@/lib/constants";
 import { createHotelSchema, createTaxiCompanySchema, createAdminUserSchema, createOperatorSchema } from "@/lib/validations";
+
+// Retries a write once on a transient DB connection blip (common against a
+// pooled connection like Supabase's on a serverless host) instead of
+// leaving a multi-step transaction's caller thinking nothing happened. If
+// the retry then hits a duplicate-key error, the first attempt actually
+// committed before the connection dropped — surface that plainly instead
+// of a raw constraint error.
+async function withDbRetry<T>(fn: () => Promise<T>, attempts = 2): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        throw new Error(
+          "Il tentativo precedente potrebbe essere comunque andato a buon fine (intoppo di connessione). Controlla l'elenco prima di riprovare."
+        );
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      const isTransient = /connection|ECONNRESET|terminated unexpectedly|timed out/i.test(message);
+      if (!isTransient || attempt >= attempts) throw err;
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+    }
+  }
+}
 
 export async function createHotel(formData: FormData) {
   await requireAdmin();
@@ -27,28 +52,30 @@ export async function createHotel(formData: FormData) {
 
   const passwordHash = await bcrypt.hash(staffPassword, 10);
 
-  await prisma.$transaction(async (tx) => {
-    const hotel = await tx.hotel.create({
-      data: {
-        name: data.name,
-        slug: data.slug,
-        address: data.address || null,
-        email: data.email || null,
-        phone: data.phone || null,
-        primaryTaxiCompanyId: data.primaryTaxiCompanyId || null,
-      },
-    });
-    await tx.user.create({
-      data: {
-        email: staffEmail,
-        passwordHash,
-        name: staffName,
-        role: ROLES.HOTEL_STAFF,
-        hotelId: hotel.id,
-        isOrgAdmin: true,
-      },
-    });
-  });
+  await withDbRetry(() =>
+    prisma.$transaction(async (tx) => {
+      const hotel = await tx.hotel.create({
+        data: {
+          name: data.name,
+          slug: data.slug,
+          address: data.address || null,
+          email: data.email || null,
+          phone: data.phone || null,
+          primaryTaxiCompanyId: data.primaryTaxiCompanyId || null,
+        },
+      });
+      await tx.user.create({
+        data: {
+          email: staffEmail,
+          passwordHash,
+          name: staffName,
+          role: ROLES.HOTEL_STAFF,
+          hotelId: hotel.id,
+          isOrgAdmin: true,
+        },
+      });
+    })
+  );
 
   revalidatePath("/admin/hotels");
 }
@@ -70,26 +97,28 @@ export async function createTaxiCompany(formData: FormData) {
 
   const passwordHash = await bcrypt.hash(staffPassword, 10);
 
-  await prisma.$transaction(async (tx) => {
-    const taxiCompany = await tx.taxiCompany.create({
-      data: {
-        name: data.name,
-        email: data.email || null,
-        phone: data.phone || null,
-        commissionRate: data.commissionRate ?? null,
-      },
-    });
-    await tx.user.create({
-      data: {
-        email: staffEmail,
-        passwordHash,
-        name: staffName,
-        role: ROLES.TAXI_STAFF,
-        taxiCompanyId: taxiCompany.id,
-        isOrgAdmin: true,
-      },
-    });
-  });
+  await withDbRetry(() =>
+    prisma.$transaction(async (tx) => {
+      const taxiCompany = await tx.taxiCompany.create({
+        data: {
+          name: data.name,
+          email: data.email || null,
+          phone: data.phone || null,
+          commissionRate: data.commissionRate ?? null,
+        },
+      });
+      await tx.user.create({
+        data: {
+          email: staffEmail,
+          passwordHash,
+          name: staffName,
+          role: ROLES.TAXI_STAFF,
+          taxiCompanyId: taxiCompany.id,
+          isOrgAdmin: true,
+        },
+      });
+    })
+  );
 
   revalidatePath("/admin/taxi-companies");
 }
