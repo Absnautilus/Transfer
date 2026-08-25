@@ -76,6 +76,57 @@
   --shadow-lg: 0 16px 40px rgba(22, 24, 43, 0.18);
 }
 
+/* Semantic aliases using the exact variable names from the shared
+   cross-app design doc (Planner Turni / Housekeeping / Transfer), so
+   markup copied from that doc — or any future component built against
+   it — works here without translating names. Each one just points at
+   the Tailwind-scale token above that already carries the right value;
+   change the palette in the @theme block, not here. Light mode only —
+   this app has no dark-mode toggle yet, so there is no [data-theme]
+   or prefers-color-scheme variant of this block. */
+:root {
+  --bg: var(--color-slate-50);
+  --surface: #ffffff;
+  --surface-2: var(--color-slate-100);
+  --ink: var(--color-slate-900);
+  --ink-2: var(--color-slate-700);
+  --muted: var(--color-slate-500);
+  --line: var(--color-slate-200);
+  --line-strong: var(--color-slate-300);
+
+  --accent: var(--color-purple-600);
+  --accent-ink: #ffffff;
+  --accent-soft: var(--color-purple-100);
+  --accent-soft-line: var(--color-purple-200);
+
+  --wait-bg: var(--color-amber-100);
+  --wait-ink: var(--color-amber-800);
+  --wait-line: var(--color-amber-600);
+  --prog-bg: var(--color-blue-100);
+  --prog-ink: var(--color-blue-800);
+  --prog-line: var(--color-blue-600);
+  --ok-bg: var(--color-emerald-100);
+  --ok-ink: var(--color-emerald-800);
+  --ok-line: var(--color-emerald-600);
+  --done-bg: var(--color-green-100);
+  --done-ink: var(--color-green-800);
+  --done-line: var(--color-green-600);
+  --bad-bg: var(--color-red-100);
+  --bad-ink: var(--color-red-600);
+  --bad-line: var(--color-red-500);
+  --off-bg: var(--color-slate-100);
+  --off-ink: var(--color-slate-600);
+  --off-line: var(--color-slate-300);
+
+  --r-sm: var(--radius-md);
+  --r-md: var(--radius-lg);
+  --r-lg: var(--radius-xl);
+
+  --f-head: var(--font-heading);
+  --f-body: var(--font-sans);
+  --mono: var(--font-mono);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
