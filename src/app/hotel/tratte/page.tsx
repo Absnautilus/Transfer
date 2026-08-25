@@ -34,7 +34,6 @@ export default async function HotelRoutesPage() {
               <th className="px-4 py-2">Durata</th>
               <th className="px-4 py-2">Prezzo</th>
               <th className="px-4 py-2">Stato</th>
-              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">

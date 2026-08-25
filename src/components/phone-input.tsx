@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/field";
-import { FlagIcon } from "@/components/flag-icon";
+import { CircleFlag } from "@/components/circle-flag";
 import { DEFAULT_PHONE_PREFIX, PHONE_PREFIXES } from "@/lib/phone-prefixes";
 
 export function PhoneInput({
@@ -29,7 +29,7 @@ export function PhoneInput({
           onClick={() => setOpen((o) => !o)}
           className="flex h-full items-center gap-1.5 rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 shadow-sm hover:bg-slate-50"
         >
-          <FlagIcon iso={current.iso} className="h-3.5 w-5 rounded-sm" />
+          <CircleFlag iso={current.iso} className="h-5 w-5" />
           {current.code}
         </button>
         {open && (
@@ -46,7 +46,7 @@ export function PhoneInput({
                   }}
                   className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-sm hover:bg-slate-50"
                 >
-                  <FlagIcon iso={p.iso} className="h-3.5 w-5 shrink-0 rounded-sm" />
+                  <CircleFlag iso={p.iso} className="h-5 w-5" />
                   <span className="flex-1 truncate text-slate-700">{p.country}</span>
                   <span className="text-slate-400">{p.code}</span>
                 </button>

@@ -1,4 +1,5 @@
 import { StatusBadge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TaxiRowActions } from "@/components/taxi-row-actions";
 import { HotelRowActions } from "@/components/hotel-row-actions";
 import { FlightCheckButton } from "@/components/flight-check-button";
@@ -43,11 +44,7 @@ export function TransfersTable({
   drivers?: Driver[];
 }) {
   if (transfers.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-        Nessun transfer trovato per i filtri selezionati.
-      </div>
-    );
+    return <EmptyState title="Nessun transfer trovato per i filtri selezionati" />;
   }
 
   return (

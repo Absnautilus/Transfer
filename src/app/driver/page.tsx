@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireDriverUser } from "@/lib/session";
 import { todayISO } from "@/lib/transfers";
 import { StatusBadge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { TRANSFER_STATUS } from "@/lib/constants";
 
 export default async function DriverHomePage() {
@@ -18,9 +19,7 @@ export default async function DriverHomePage() {
     <div>
       <h1 className="mb-4 text-xl font-semibold text-slate-900">I miei transfer</h1>
       {transfers.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-          Nessun transfer assegnato al momento.
-        </div>
+        <EmptyState title="Nessun transfer assegnato al momento" />
       ) : (
         <div className="space-y-3">
           {transfers.map((t) => (

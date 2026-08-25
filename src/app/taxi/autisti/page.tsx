@@ -29,7 +29,6 @@ export default async function DriversPage() {
               <th className="px-4 py-2">Telefono</th>
               <th className="px-4 py-2">Veicolo</th>
               <th className="px-4 py-2">Stato</th>
-              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">

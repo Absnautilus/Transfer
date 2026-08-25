@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { toggleDriverActive } from "./actions";
 
 export function DriverRow({ driver }: { driver: { id: string; name: string; phone: string; vehicleInfo: string | null; active: boolean } }) {
@@ -12,12 +12,12 @@ export function DriverRow({ driver }: { driver: { id: string; name: string; phon
       <td className="px-4 py-2 text-slate-600">{driver.phone}</td>
       <td className="px-4 py-2 text-slate-600">{driver.vehicleInfo || "—"}</td>
       <td className="px-4 py-2">
-        <span className={driver.active ? "text-emerald-600" : "text-slate-400"}>{driver.active ? "Attivo" : "Non attivo"}</span>
-      </td>
-      <td className="px-4 py-2">
-        <Button size="sm" variant="ghost" disabled={pending} onClick={() => startTransition(() => toggleDriverActive(driver.id))}>
-          {driver.active ? "Disattiva" : "Riattiva"}
-        </Button>
+        <Toggle
+          checked={driver.active}
+          disabled={pending}
+          onChange={() => startTransition(() => toggleDriverActive(driver.id))}
+          label={<span className={driver.active ? "text-emerald-600" : "text-slate-400"}>{driver.active ? "Attivo" : "Non attivo"}</span>}
+        />
       </td>
     </tr>
   );

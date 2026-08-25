@@ -4,6 +4,7 @@ import { requireHotelUser } from "@/lib/session";
 import { REQUEST_STATUS } from "@/lib/constants";
 import { RequestRow } from "./request-row";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/ui/empty-state";
 
 const TABS = [
   { key: "pending", label: "In attesa", status: REQUEST_STATUS.PENDING },
@@ -64,9 +65,9 @@ export default async function HotelRequestsPage({
       </div>
 
       {requests.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500">
-          Nessuna richiesta {activeTab === "pending" ? "in attesa" : activeTab === "accepted" ? "accettata" : "rifiutata"} al momento.
-        </div>
+        <EmptyState
+          title={`Nessuna richiesta ${activeTab === "pending" ? "in attesa" : activeTab === "accepted" ? "accettata" : "rifiutata"} al momento`}
+        />
       ) : (
         <div className="space-y-3">
           {requests.map((request) => (

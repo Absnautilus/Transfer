@@ -1,4 +1,5 @@
 import { DateField } from "@/components/ui/date-field";
+import { StatCard } from "@/components/ui/stat-card";
 
 type Row = {
   id: string;
@@ -53,18 +54,9 @@ export function AccountingView({ rows, from, to }: { rows: Row[]; from: string; 
       </form>
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs uppercase text-slate-400">Fatturato transfer</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">€ {totals.price.toFixed(2)}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs uppercase text-slate-400">Provvigione totale</p>
-          <p className="mt-1 text-2xl font-semibold text-purple-600">€ {totals.commission.toFixed(2)}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-xs uppercase text-slate-400">Netto compagnia taxi</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">€ {totals.net.toFixed(2)}</p>
-        </div>
+        <StatCard label="Fatturato transfer" value={`€ ${totals.price.toFixed(2)}`} accent="var(--color-slate-900)" />
+        <StatCard label="Provvigione totale" value={`€ ${totals.commission.toFixed(2)}`} />
+        <StatCard label="Netto compagnia taxi" value={`€ ${totals.net.toFixed(2)}`} accent="var(--color-slate-900)" />
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">

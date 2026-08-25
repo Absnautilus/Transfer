@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
 import { DateField } from "@/components/ui/date-field";
+import { Radio } from "@/components/ui/radio";
 import { PhoneInput } from "@/components/phone-input";
 import { BagsInput } from "@/components/bags-input";
 import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing";
@@ -176,15 +177,9 @@ export function RequestForm({
 
       <FieldGroup>
         <Label required>{dict.transferLabel}</Label>
-        <div className="mb-2 flex gap-4 text-sm text-slate-600">
-          <label className="flex items-center gap-1.5">
-            <input type="radio" checked={direction === "ARRIVO"} onChange={() => setDirection("ARRIVO")} />
-            {dict.directionArrival}
-          </label>
-          <label className="flex items-center gap-1.5">
-            <input type="radio" checked={direction === "PARTENZA"} onChange={() => setDirection("PARTENZA")} />
-            {dict.directionDeparture}
-          </label>
+        <div className="mb-2 flex gap-4">
+          <Radio checked={direction === "ARRIVO"} onChange={() => setDirection("ARRIVO")} label={dict.directionArrival} />
+          <Radio checked={direction === "PARTENZA"} onChange={() => setDirection("PARTENZA")} label={dict.directionDeparture} />
         </div>
 
         <p className="mb-1 text-xs text-slate-500">{direction === "ARRIVO" ? dict.fromPrompt : dict.toPrompt}</p>
@@ -222,7 +217,18 @@ export function RequestForm({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <input type="radio" name="routeOptionRadio" className="mr-2" checked={selected} onChange={() => setSelectedRouteId(m.id)} />
+                      <input
+                        type="radio"
+                        name="routeOptionRadio"
+                        className="sr-only"
+                        checked={selected}
+                        onChange={() => setSelectedRouteId(m.id)}
+                      />
+                      <span
+                        className={`mr-2 inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border-[1.5px] align-middle transition-colors ${selected ? "border-purple-600" : "border-slate-300"}`}
+                      >
+                        <span className={`h-2 w-2 rounded-full bg-purple-600 transition-transform ${selected ? "scale-100" : "scale-0"}`} />
+                      </span>
                       <span className="font-medium text-slate-900">{m.transferMode ?? dict.modeStandardFallback}</span>
                       {m.durationMinutes && (
                         <span className="ml-2 text-xs text-slate-500">
@@ -252,12 +258,9 @@ export function RequestForm({
       {direction === "ARRIVO" && (
         <FieldGroup>
           <Label required>{dict.arrivalModeQuestion}</Label>
-          <div className="mb-2 flex flex-wrap gap-3 text-sm text-slate-600">
+          <div className="mb-2 flex flex-wrap gap-3">
             {ARRIVAL_MODES.map((mode) => (
-              <label key={mode} className="flex items-center gap-1.5">
-                <input type="radio" checked={arrivalMode === mode} onChange={() => setArrivalMode(mode)} />
-                {t(locale).arrivalMode[mode]}
-              </label>
+              <Radio key={mode} checked={arrivalMode === mode} onChange={() => setArrivalMode(mode)} label={t(locale).arrivalMode[mode]} />
             ))}
           </div>
 

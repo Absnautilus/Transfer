@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import { isValidPriceTiers, type PriceTiers } from "@/lib/pricing";
 import { toggleRouteActive } from "./actions";
 
@@ -34,12 +34,12 @@ export function RouteRow({
       <td className="px-4 py-2 text-slate-600">{route.durationMinutes ? `${route.durationMinutes} min` : "—"}</td>
       <td className="px-4 py-2 text-slate-600">{typeof dayFrom4 === "number" ? `da € ${dayFrom4.toFixed(2)}` : "—"}</td>
       <td className="px-4 py-2">
-        <span className={route.active ? "text-emerald-600" : "text-slate-400"}>{route.active ? "Attiva" : "Non attiva"}</span>
-      </td>
-      <td className="px-4 py-2">
-        <Button size="sm" variant="ghost" disabled={pending} onClick={() => startTransition(() => toggleRouteActive(route.id))}>
-          {route.active ? "Disattiva" : "Riattiva"}
-        </Button>
+        <Toggle
+          checked={route.active}
+          disabled={pending}
+          onChange={() => startTransition(() => toggleRouteActive(route.id))}
+          label={<span className={route.active ? "text-emerald-600" : "text-slate-400"}>{route.active ? "Attiva" : "Non attiva"}</span>}
+        />
       </td>
     </tr>
   );

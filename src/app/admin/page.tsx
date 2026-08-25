@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { REQUEST_STATUS, TRANSFER_STATUS } from "@/lib/constants";
 import { todayISO } from "@/lib/date";
+import { StatCard } from "@/components/ui/stat-card";
 
 export default async function AdminOverviewPage() {
   await requireAdmin();
@@ -31,21 +31,9 @@ export default async function AdminOverviewPage() {
       <p className="mb-6 text-sm text-slate-500">Vista d&apos;insieme su tutti gli hotel e le compagnie taxi registrati.</p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {cards.map((c) => {
-          const content = (
-            <div className="rounded-lg border border-slate-200 bg-white p-4">
-              <p className="text-xs uppercase text-slate-400">{c.label}</p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">{c.value}</p>
-            </div>
-          );
-          return c.href ? (
-            <Link key={c.label} href={c.href} className="hover:border-purple-300">
-              {content}
-            </Link>
-          ) : (
-            <div key={c.label}>{content}</div>
-          );
-        })}
+        {cards.map((c) => (
+          <StatCard key={c.label} label={c.label} value={c.value} href={c.href} />
+        ))}
       </div>
     </div>
   );
