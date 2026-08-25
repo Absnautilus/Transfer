@@ -1,19 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #eaecf9;
+  --foreground: #16182b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-public-sans);
+  --font-heading: var(--font-manrope);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Suite design standard — neutral scale (lavender-tinted, from Planner Turni) */
+  --color-slate-50: #eaecf9;
+  --color-slate-100: #f1f2fa;
+  --color-slate-200: #e3e5f3;
+  --color-slate-300: #d3d6ec;
+  --color-slate-400: #abafc9;
+  --color-slate-500: #8a8fa3;
+  --color-slate-600: #6b6f86;
+  --color-slate-700: #4a4d68;
+  --color-slate-800: #2e304a;
+  --color-slate-900: #16182b;
+  --color-slate-950: #0d0e18;
+
+  /* Suite design standard — accent (brand purple, reserved for primary actions) */
+  --color-purple-50: #f9f1fc;
+  --color-purple-100: #f4e8fa;
+  --color-purple-200: #e4c7f2;
+  --color-purple-300: #d19fe8;
+  --color-purple-400: #bd77de;
+  --color-purple-500: #ac5cd3;
+  --color-purple-600: #9c4fc7;
+  --color-purple-700: #7e3ea0;
+  --color-purple-800: #61307c;
+  --color-purple-900: #452358;
+
+  /* Suite design standard — status vocabulary */
+  /* In attesa (wait) */
+  --color-amber-100: #fff1d6;
+  --color-amber-600: #c99a2e;
+  --color-amber-700: #a67e1f;
+  --color-amber-800: #8a6416;
+  /* In corso (prog) */
+  --color-blue-100: #eaf1fe;
+  --color-blue-600: #4a7fe0;
+  --color-blue-700: #3968cf;
+  --color-blue-800: #2a5fcc;
+  --color-indigo-100: #eaf1fe;
+  --color-indigo-600: #4a7fe0;
+  --color-indigo-800: #2a5fcc;
+  /* Confermato (ok) */
+  --color-emerald-100: #dff6e8;
+  --color-emerald-600: #2e9860;
+  --color-emerald-700: #23864f;
+  --color-emerald-800: #1e7a46;
+  /* Completato (done) — deeper green, distinct from "confermato" */
+  --color-green-100: #c9eedb;
+  --color-green-600: #1c8a56;
+  --color-green-700: #187546;
+  --color-green-800: #146138;
+  /* Annullato / avviso (bad) */
+  --color-red-100: #fde8e8;
+  --color-red-500: #c24545;
+  --color-red-600: #b23a3a;
+  --color-red-800: #8a2b2b;
+
+  /* Suite design standard — radius & shadow */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --shadow-sm: 0 2px 8px rgba(22, 24, 43, 0.05);
+  --shadow-md: 0 8px 24px rgba(22, 24, 43, 0.08);
+  --shadow-lg: 0 16px 40px rgba(22, 24, 43, 0.18);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), var(--font-sans), sans-serif;
 }
