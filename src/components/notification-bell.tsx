@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import { markAllNotificationsRead, markNotificationRead } from "@/lib/notification-actions";
 
 export type NotificationItem = {
@@ -14,7 +15,15 @@ export type NotificationItem = {
   createdAt: string;
 };
 
-export function NotificationBell({ notifications, unreadCount }: { notifications: NotificationItem[]; unreadCount: number }) {
+export function NotificationBell({
+  notifications,
+  unreadCount,
+  className,
+}: {
+  notifications: NotificationItem[];
+  unreadCount: number;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -23,7 +32,7 @@ export function NotificationBell({ notifications, unreadCount }: { notifications
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="relative rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer"
+        className={cn("relative rounded-full p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 cursor-pointer", className)}
         aria-label="Notifiche"
       >
         <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2">
