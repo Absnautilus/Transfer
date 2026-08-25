@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Textarea } from "@/components/ui/field";
+import { DateField } from "@/components/ui/date-field";
 import { PhoneInput } from "@/components/phone-input";
 import { BagsInput } from "@/components/bags-input";
 import { computePrice, isValidPriceTiers, type PriceTiers } from "@/lib/pricing";
@@ -146,13 +147,13 @@ export function RequestForm({
           <Label htmlFor="date" required>
             {dict.date}
           </Label>
-          <Input id="date" name="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+          <DateField id="date" name="date" value={date} onChange={setDate} required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="time" required>
             {dict.time}
           </Label>
-          <Input id="time" name="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+          <Input id="time" name="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required className="font-mono" />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="pax" required>

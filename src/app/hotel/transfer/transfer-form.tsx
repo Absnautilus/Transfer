@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Select, Textarea } from "@/components/ui/field";
+import { DateField } from "@/components/ui/date-field";
 import { BagsInput } from "@/components/bags-input";
 import { RoutePointSelect } from "@/components/route-point-select";
 import { isRedirectError } from "@/lib/is-redirect-error";
@@ -106,13 +107,13 @@ export function TransferForm({
           <Label htmlFor="date" required>
             Data
           </Label>
-          <Input id="date" name="date" type="date" defaultValue={initial?.date} required />
+          <DateField id="date" name="date" defaultValue={initial?.date} required />
         </FieldGroup>
         <FieldGroup>
           <Label htmlFor="time" required>
             Orario
           </Label>
-          <Input id="time" name="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+          <Input id="time" name="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required className="font-mono" />
         </FieldGroup>
         <FieldGroup className="flex items-end pb-1">
           <p className="text-sm text-slate-500">

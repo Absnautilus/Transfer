@@ -1,3 +1,5 @@
+import { DateField } from "@/components/ui/date-field";
+
 type Row = {
   id: string;
   date: string;
@@ -39,11 +41,11 @@ export function AccountingView({ rows, from, to }: { rows: Row[]; from: string; 
       <form className="mb-4 flex flex-wrap items-end gap-3" method="get">
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-500">Dal</label>
-          <input type="date" name="from" defaultValue={from} className="rounded-md border border-slate-300 px-2 py-1.5 text-sm" />
+          <DateField name="from" defaultValue={from} className="w-36" />
         </div>
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-500">Al</label>
-          <input type="date" name="to" defaultValue={to} className="rounded-md border border-slate-300 px-2 py-1.5 text-sm" />
+          <DateField name="to" defaultValue={to} className="w-36" />
         </div>
         <button type="submit" className="rounded-md bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-700">
           Filtra

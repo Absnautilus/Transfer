@@ -27,24 +27,28 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label="Language"
-        className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100"
       >
-        <FlagIcon iso={LOCALE_ISO[locale]} className="h-3.5 w-5 rounded-sm" />
-        {LOCALE_LABEL[locale]}
+        <span className="block h-5 w-5 shrink-0 overflow-hidden rounded-full">
+          <FlagIcon iso={LOCALE_ISO[locale]} className="h-full w-full object-cover" />
+        </span>
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-44 overflow-hidden rounded-md border border-slate-200 bg-white shadow-lg">
+          <div className="absolute right-0 z-20 mt-2 inline-flex gap-1.5 rounded-full border border-slate-200 bg-white p-1.5 shadow-lg">
             {LOCALES.map((l) => (
               <button
                 key={l}
                 type="button"
                 onClick={() => onChange(l)}
-                className={`flex w-full items-center gap-2 px-2.5 py-1.5 text-left text-sm hover:bg-slate-50 ${l === locale ? "bg-purple-50 text-purple-700" : "text-slate-700"}`}
+                aria-label={LOCALE_LABEL[l]}
+                title={LOCALE_LABEL[l]}
+                className={`relative h-7 w-7 shrink-0 overflow-hidden rounded-full transition-transform hover:scale-110 ${
+                  l === locale ? "outline outline-2 outline-offset-2 outline-purple-600" : ""
+                }`}
               >
-                <FlagIcon iso={LOCALE_ISO[l]} className="h-3.5 w-5 shrink-0 rounded-sm" />
-                {LOCALE_LABEL[l]}
+                <FlagIcon iso={LOCALE_ISO[l]} className="h-full w-full object-cover" />
               </button>
             ))}
           </div>

@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, FieldGroup, Input, Label, Select } from "@/components/ui/field";
+import { Checkbox } from "@/components/ui/checkbox";
 import { createOperator } from "../actions";
 
 type Org = { id: string; name: string };
@@ -79,10 +80,7 @@ export function OperatorForm({ hotels, taxiCompanies }: { hotels: Org[]; taxiCom
       </div>
 
       <FieldGroup className="flex items-center">
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" name="isOrgAdmin" value="true" className="h-4 w-4 rounded border-slate-300" />
-          Amministratore dell&apos;organizzazione (vede contabilità, gestisce il team)
-        </label>
+        <Checkbox name="isOrgAdmin" label="Amministratore dell'organizzazione (vede contabilità, gestisce il team)" />
       </FieldGroup>
 
       <FieldError>{error ?? undefined}</FieldError>

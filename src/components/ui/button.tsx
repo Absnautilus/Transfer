@@ -19,7 +19,7 @@ const sizes: Record<Size, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition-colors disabled:cursor-not-allowed cursor-pointer";
+  "inline-flex items-center justify-center gap-1.5 rounded-md font-bold transition-[filter,transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-sm active:translate-y-px active:shadow-none disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer";
 
 export function Button({
   variant = "primary",

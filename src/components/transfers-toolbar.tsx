@@ -5,6 +5,7 @@ import { useState } from "react";
 import { addDays, format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
+import { DateField } from "@/components/ui/date-field";
 import { todayISO } from "@/lib/date";
 
 export function TransfersToolbar({ basePath }: { basePath: string }) {
@@ -43,7 +44,7 @@ export function TransfersToolbar({ basePath }: { basePath: string }) {
         <Button variant="outline" size="sm" onClick={() => goTo(format(addDays(parseISO(date), -1), "yyyy-MM-dd"))}>
           ← Ieri
         </Button>
-        <Input type="date" value={date} onChange={(e) => goTo(e.target.value)} className="w-40" />
+        <DateField value={date} onChange={goTo} className="w-40" />
         <Button variant="outline" size="sm" onClick={() => goTo(format(addDays(parseISO(date), 1), "yyyy-MM-dd"))}>
           Domani →
         </Button>
