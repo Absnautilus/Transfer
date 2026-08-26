@@ -114,9 +114,11 @@ export function RouteForm() {
 
       <FieldError>{error ?? undefined}</FieldError>
 
-      <Button type="submit" variant="secondary" disabled={pending} className="mt-4">
-        {pending ? "Aggiunta…" : "Aggiungi tratta"}
-      </Button>
+      <div className="mt-4 flex justify-end">
+        <Button type="submit" variant="primary" disabled={pending}>
+          {pending ? "Aggiunta…" : "Aggiungi tratta"}
+        </Button>
+      </div>
     </form>
   );
 }

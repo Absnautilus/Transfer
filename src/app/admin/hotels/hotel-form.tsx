@@ -88,9 +88,11 @@ export function HotelForm({ taxiCompanies }: { taxiCompanies: { id: string; name
 
       <FieldError>{error ?? undefined}</FieldError>
 
-      <Button type="submit" variant="secondary" disabled={pending} className="mt-2">
-        {pending ? "Creazione…" : "Crea hotel"}
-      </Button>
+      <div className="mt-2 flex justify-end">
+        <Button type="submit" variant="primary" disabled={pending}>
+          {pending ? "Creazione…" : "Crea hotel"}
+        </Button>
+      </div>
     </form>
   );
 }

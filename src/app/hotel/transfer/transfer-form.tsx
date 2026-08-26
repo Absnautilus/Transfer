@@ -184,9 +184,11 @@ export function TransferForm({
 
       <FieldError>{error ?? undefined}</FieldError>
 
-      <Button type="submit" disabled={pending} variant="secondary">
-        {pending ? "Salvataggio…" : submitLabel}
-      </Button>
+      <div className="flex justify-end">
+        <Button type="submit" disabled={pending} variant="primary">
+          {pending ? "Salvataggio…" : submitLabel}
+        </Button>
+      </div>
     </form>
   );
 }

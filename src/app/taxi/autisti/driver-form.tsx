@@ -54,13 +54,13 @@ export function DriverForm() {
         </Label>
         <Input id="password" name="password" type="text" minLength={6} required />
       </FieldGroup>
-      <div className="flex items-end pb-4">
-        <Button type="submit" variant="secondary" disabled={pending}>
-          {pending ? "Creazione…" : "Aggiungi autista"}
-        </Button>
-      </div>
       <div className="col-span-2">
         <FieldError>{error ?? undefined}</FieldError>
+        <div className="mt-2 flex justify-end">
+          <Button type="submit" variant="primary" disabled={pending}>
+            {pending ? "Creazione…" : "Aggiungi autista"}
+          </Button>
+        </div>
       </div>
     </form>
   );

@@ -55,12 +55,12 @@ export function EditTaxiCompanyForm({
 
       <FieldError>{error ?? undefined}</FieldError>
 
-      <div className="mt-2 flex gap-2">
-        <Button type="submit" variant="secondary" disabled={pending}>
-          {pending ? "Salvataggio…" : "Salva modifiche"}
-        </Button>
+      <div className="mt-2 flex justify-end gap-2">
         <Button type="button" variant="ghost" onClick={() => router.push("/admin/taxi-companies")}>
           Annulla
+        </Button>
+        <Button type="submit" variant="primary" disabled={pending}>
+          {pending ? "Salvataggio…" : "Salva modifiche"}
         </Button>
       </div>
     </form>

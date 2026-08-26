@@ -36,7 +36,7 @@ export async function DashboardShell({
     <div className="min-h-screen flex flex-col">
       <header className="px-3 pt-3 sm:px-6 sm:pt-4">
         <div className="mx-auto max-w-7xl">
-          <div className="flex items-center gap-1 overflow-x-auto rounded-full bg-purple-600 py-2 pl-2 pr-3 text-white shadow-md">
+          <div className="flex items-center gap-1 rounded-full bg-purple-600 py-2 pl-2 pr-3 text-white shadow-md">
             <BackButton className="text-white/70 hover:bg-white/15 hover:text-white shrink-0" />
             <Link href="/" className="flex shrink-0 items-center gap-2 px-2 hover:opacity-90">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-xs font-black text-purple-600">

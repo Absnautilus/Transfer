@@ -46,9 +46,11 @@ export function AdminUserForm() {
       </FieldGroup>
       <div className="col-span-full">
         <FieldError>{error ?? undefined}</FieldError>
-        <Button type="submit" variant="secondary" disabled={pending}>
-          {pending ? "Creazione…" : "Aggiungi amministratore"}
-        </Button>
+        <div className="flex justify-end">
+          <Button type="submit" variant="primary" disabled={pending}>
+            {pending ? "Creazione…" : "Aggiungi amministratore"}
+          </Button>
+        </div>
       </div>
     </form>
   );

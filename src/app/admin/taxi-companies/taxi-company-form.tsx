@@ -71,9 +71,11 @@ export function TaxiCompanyForm() {
 
       <FieldError>{error ?? undefined}</FieldError>
 
-      <Button type="submit" variant="secondary" disabled={pending} className="mt-2">
-        {pending ? "Creazione…" : "Crea compagnia"}
-      </Button>
+      <div className="mt-2 flex justify-end">
+        <Button type="submit" variant="primary" disabled={pending}>
+          {pending ? "Creazione…" : "Crea compagnia"}
+        </Button>
+      </div>
     </form>
   );
 }
