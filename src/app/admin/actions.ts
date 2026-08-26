@@ -6,7 +6,15 @@ import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { requireAdmin } from "@/lib/session";
 import { ROLES } from "@/lib/constants";
-import { createHotelSchema, createTaxiCompanySchema, createAdminUserSchema, createOperatorSchema } from "@/lib/validations";
+import {
+  createHotelSchema,
+  createTaxiCompanySchema,
+  createAdminUserSchema,
+  createOperatorSchema,
+  updateHotelSchema,
+  updateTaxiCompanySchema,
+  updateUserSchema,
+} from "@/lib/validations";
 
 // Retries a write once on a transient DB connection blip (common against a
 // pooled connection like Supabase's on a serverless host) instead of
@@ -172,4 +180,99 @@ export async function createAdminUser(formData: FormData) {
   });
 
   revalidatePath("/admin/impostazioni");
+}
+
+export async function updateHotel(hotelId: string, formData: FormData) {
+  await requireAdmin();
+  const parsed = updateHotelSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dati non validi.");
+  const data = parsed.data;
+
+  const existingSlug = await prisma.hotel.findUnique({ where: { slug: data.slug } });
+  if (existingSlug && existingSlug.id !== hotelId) throw new Error("Slug già in uso da un altro hotel.");
+
+  await prisma.hotel.update({
+    where: { id: hotelId },
+    data: {
+      name: data.name,
+      slug: data.slug,
+      address: data.address || null,
+      email: data.email || null,
+      phone: data.phone || null,
+      primaryTaxiCompanyId: data.primaryTaxiCompanyId || null,
+    },
+  });
+
+  revalidatePath("/admin/hotels");
+}
+
+export async function deleteHotel(hotelId: string) {
+  await requireAdmin();
+  await withDbRetry(() =>
+    prisma.$transaction(async (tx) => {
+      await tx.user.deleteMany({ where: { hotelId } });
+      await tx.hotel.delete({ where: { id: hotelId } });
+    })
+  );
+  revalidatePath("/admin/hotels");
+}
+
+export async function updateTaxiCompany(taxiCompanyId: string, formData: FormData) {
+  await requireAdmin();
+  const parsed = updateTaxiCompanySchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dati non validi.");
+  const data = parsed.data;
+
+  await prisma.taxiCompany.update({
+    where: { id: taxiCompanyId },
+    data: {
+      name: data.name,
+      email: data.email || null,
+      phone: data.phone || null,
+      commissionRate: data.commissionRate ?? null,
+    },
+  });
+
+  revalidatePath("/admin/taxi-companies");
+}
+
+export async function deleteTaxiCompany(taxiCompanyId: string) {
+  await requireAdmin();
+  await withDbRetry(() =>
+    prisma.$transaction(async (tx) => {
+      await tx.user.deleteMany({ where: { taxiCompanyId } });
+      await tx.taxiCompany.delete({ where: { id: taxiCompanyId } });
+    })
+  );
+  revalidatePath("/admin/taxi-companies");
+}
+
+export async function updateUser(userId: string, formData: FormData) {
+  await requireAdmin();
+  const parsed = updateUserSchema.safeParse(Object.fromEntries(formData.entries()));
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Dati non validi.");
+  const data = parsed.data;
+  const email = data.email.trim().toLowerCase();
+
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser && existingUser.id !== userId) throw new Error("Nome utente/email già in uso.");
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      name: data.name,
+      email,
+      isOrgAdmin: data.isOrgAdmin,
+      ...(data.password ? { passwordHash: await bcrypt.hash(data.password, 10) } : {}),
+    },
+  });
+
+  revalidatePath("/admin/operatori");
+}
+
+export async function deleteUser(userId: string) {
+  const admin = await requireAdmin();
+  if (admin.id === userId) throw new Error("Non puoi eliminare il tuo stesso account.");
+  await prisma.user.delete({ where: { id: userId } });
+  revalidatePath("/admin/operatori");
 }

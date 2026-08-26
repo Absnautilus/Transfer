@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { TaxiCompanyForm } from "./taxi-company-form";
+import { deleteTaxiCompany } from "../actions";
 
 export default async function AdminTaxiCompaniesPage() {
   await requireAdmin();
@@ -32,6 +35,7 @@ export default async function AdminTaxiCompaniesPage() {
               <th className="px-4 py-2">Utenti</th>
               <th className="px-4 py-2">Autisti</th>
               <th className="px-4 py-2">Transfer</th>
+              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -42,6 +46,22 @@ export default async function AdminTaxiCompaniesPage() {
                 <td className="px-4 py-2 text-slate-600">{tc._count.users}</td>
                 <td className="px-4 py-2 text-slate-600">{tc._count.drivers}</td>
                 <td className="px-4 py-2 text-slate-600">{tc._count.transfers}</td>
+                <td className="px-4 py-2">
+                  <div className="flex justify-end gap-2">
+                    <Link href={`/admin/taxi-companies/${tc.id}`}>
+                      <span className="inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                        Modifica
+                      </span>
+                    </Link>
+                    <ConfirmButton
+                      label="Elimina"
+                      title={`Eliminare "${tc.name}"?`}
+                      description="Verranno eliminati anche gli autisti e gli account operatore di questa compagnia. I transfer collegati restano ma senza compagnia assegnata. L'azione è irreversibile."
+                      confirmLabel="Elimina definitivamente"
+                      onConfirm={deleteTaxiCompany.bind(null, tc.id)}
+                    />
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

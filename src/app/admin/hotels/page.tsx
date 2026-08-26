@@ -1,7 +1,10 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 import { HotelForm } from "./hotel-form";
+import { deleteHotel } from "../actions";
 
 export default async function AdminHotelsPage() {
   await requireAdmin();
@@ -35,6 +38,7 @@ export default async function AdminHotelsPage() {
               <th className="px-4 py-2">Compagnia taxi</th>
               <th className="px-4 py-2">Utenti</th>
               <th className="px-4 py-2">Transfer</th>
+              <th className="px-4 py-2"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -47,6 +51,22 @@ export default async function AdminHotelsPage() {
                 <td className="px-4 py-2 text-slate-600">{h.primaryTaxiCompany?.name ?? "—"}</td>
                 <td className="px-4 py-2 text-slate-600">{h._count.users}</td>
                 <td className="px-4 py-2 text-slate-600">{h._count.transfers}</td>
+                <td className="px-4 py-2">
+                  <div className="flex justify-end gap-2">
+                    <Link href={`/admin/hotels/${h.id}`}>
+                      <span className="inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                        Modifica
+                      </span>
+                    </Link>
+                    <ConfirmButton
+                      label="Elimina"
+                      title={`Eliminare "${h.name}"?`}
+                      description="Verranno eliminati anche tutte le tratte, le richieste, i transfer e gli account operatore di questo hotel. L'azione è irreversibile."
+                      confirmLabel="Elimina definitivamente"
+                      onConfirm={deleteHotel.bind(null, h.id)}
+                    />
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>

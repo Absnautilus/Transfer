@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
-import { cn } from "@/lib/cn";
 import { prisma } from "@/lib/prisma";
 import { deriveInitials } from "@/lib/initials";
 import { BackButton } from "@/components/back-button";
 import { NotificationBell } from "@/components/notification-bell";
+import { NavLinks, type NavItem } from "@/components/nav-links";
+import { TextScaleToggle } from "@/components/text-scale-toggle";
 
 export async function DashboardShell({
   title,
   orgName,
   userName,
+  userRoleLabel,
   userId,
   nav,
   children,
@@ -17,8 +19,9 @@ export async function DashboardShell({
   title: string;
   orgName: string;
   userName: string;
+  userRoleLabel: string;
   userId: string;
-  nav: { href: string; label: string }[];
+  nav: NavItem[];
   children: React.ReactNode;
 }) {
   const notifications = await prisma.notification.findMany({
@@ -48,20 +51,13 @@ export async function DashboardShell({
               <span className="text-[10px] font-bold uppercase tracking-wide text-white/60">{title}</span>
               <span className="text-sm font-bold">{orgName}</span>
             </div>
+            <span className="mx-1 hidden h-5 w-px shrink-0 bg-white/25 lg:block" />
 
-            <nav className="ml-1 hidden items-center gap-0.5 lg:flex">
-              {nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-bold text-white/70 transition-colors hover:bg-white/15 hover:text-white"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            <NavLinks nav={nav} className="ml-1 hidden items-center gap-0.5 lg:flex" />
 
             <div className="flex-1" />
+
+            <TextScaleToggle className="hidden shrink-0 rounded-full px-2 py-1.5 text-xs font-black text-white/80 hover:bg-white/15 hover:text-white sm:inline-flex" />
 
             <NotificationBell
               notifications={notifications.map((n) => ({
@@ -83,7 +79,10 @@ export async function DashboardShell({
               <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white text-[10px] font-extrabold text-purple-600">
                 {initials}
               </span>
-              <span className="whitespace-nowrap text-xs font-bold">{userName}</span>
+              <span className="flex flex-col leading-tight">
+                <span className="text-[9px] font-bold uppercase tracking-wide text-white/60">{userRoleLabel}</span>
+                <span className="whitespace-nowrap text-xs font-bold">{userName}</span>
+              </span>
             </div>
 
             <form
@@ -106,17 +105,7 @@ export async function DashboardShell({
             </form>
           </div>
 
-          <nav className={cn("flex gap-1 overflow-x-auto px-1 py-2 lg:hidden")}>
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm hover:text-purple-600"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <NavLinks nav={nav} variant="light" className="flex gap-1 overflow-x-auto px-1 py-2 lg:hidden" />
         </div>
       </header>
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">{children}</main>

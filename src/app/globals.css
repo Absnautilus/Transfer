@@ -133,6 +133,15 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Text-size toggle ("Aa" in the operator navbar) — bumps the root font
+   size so every rem-based measurement in the app scales together. */
+html[data-text-scale="2"] {
+  font-size: 108%;
+}
+html[data-text-scale="3"] {
+  font-size: 116%;
+}
+
 h1,
 h2,
 h3,

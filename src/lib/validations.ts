@@ -81,6 +81,20 @@ export const createTaxiCompanySchema = z.object({
   commissionRate: z.coerce.number().min(0).max(100).optional(),
 });
 
+export const updateHotelSchema = createHotelSchema;
+export const updateTaxiCompanySchema = createTaxiCompanySchema;
+
+export const updateUserSchema = z.object({
+  name: z.string().trim().min(2, "Indica il nome"),
+  email: z
+    .string()
+    .trim()
+    .min(3, "Indica un nome utente di almeno 3 caratteri")
+    .regex(/^\S+$/, "Il nome utente non può contenere spazi"),
+  password: z.string().min(6, "La password deve avere almeno 6 caratteri").optional().or(z.literal("")),
+  isOrgAdmin: z.coerce.boolean().optional().default(false),
+});
+
 export const createAdminUserSchema = z.object({
   name: z.string().trim().min(2, "Indica il nome"),
   email: z.string().trim().email(),
