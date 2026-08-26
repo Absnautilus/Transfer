@@ -44,7 +44,7 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label="Language"
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100"
+        className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-slate-100"
       >
         <CircleFlag iso={LOCALE_ISO[locale]} className="h-5 w-5" />
       </button>
@@ -57,7 +57,7 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
               onClick={() => onChange(l)}
               aria-label={LOCALE_LABEL[l]}
               title={LOCALE_LABEL[l]}
-              className={`rounded-full transition-transform hover:scale-110 ${l === locale ? "ring-2 ring-purple-600 ring-offset-2" : ""}`}
+              className={`cursor-pointer rounded-full transition-transform hover:scale-110 ${l === locale ? "ring-2 ring-purple-600 ring-offset-2" : ""}`}
             >
               <CircleFlag iso={LOCALE_ISO[l]} className="h-7 w-7" />
             </button>

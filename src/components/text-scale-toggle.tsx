@@ -49,7 +49,13 @@ export function TextScaleToggle({ className }: { className?: string }) {
 
   return (
     <div className="relative" ref={ref}>
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-label="Dimensione testo" title="Dimensione testo" className={className}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-label="Dimensione testo"
+        title="Dimensione testo"
+        className={`cursor-pointer ${className ?? ""}`}
+      >
         Aa
       </button>
       {open && (
@@ -60,7 +66,7 @@ export function TextScaleToggle({ className }: { className?: string }) {
               type="button"
               onClick={() => select(s.value)}
               aria-label={`Dimensione testo ${s.value}`}
-              className={`flex h-8 w-8 items-center justify-center rounded-full font-black transition-colors ${s.sizeClass} ${
+              className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full font-black transition-colors ${s.sizeClass} ${
                 scale === s.value ? "bg-purple-600 text-white" : "text-slate-600 hover:bg-slate-100"
               }`}
             >

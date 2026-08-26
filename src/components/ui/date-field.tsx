@@ -90,7 +90,7 @@ export function DateField({
         id={id}
         type="button"
         onClick={() => (open ? setOpen(false) : openPopover())}
-        className="flex w-full items-center justify-between gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 shadow-sm hover:border-slate-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+        className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 shadow-sm hover:border-slate-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
       >
         <span className={selectedDate ? "" : "text-slate-400"}>
           {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Seleziona data"}
@@ -107,7 +107,7 @@ export function DateField({
             <button
               type="button"
               onClick={() => setViewMonth((m) => subMonths(m, 1))}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               aria-label="Mese precedente"
             >
               ‹
@@ -116,7 +116,7 @@ export function DateField({
             <button
               type="button"
               onClick={() => setViewMonth((m) => addMonths(m, 1))}
-              className="flex h-6 w-6 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+              className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900"
               aria-label="Mese successivo"
             >
               ›
@@ -137,7 +137,7 @@ export function DateField({
                   key={day.toISOString()}
                   type="button"
                   onClick={() => select(day)}
-                  className={`aspect-square rounded-lg text-center font-mono text-[11.5px] transition-colors ${
+                  className={`aspect-square cursor-pointer rounded-lg text-center font-mono text-[11.5px] transition-colors ${
                     selected
                       ? "bg-purple-600 font-bold text-white"
                       : today

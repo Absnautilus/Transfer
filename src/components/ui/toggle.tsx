@@ -22,7 +22,7 @@ export function Toggle({
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative h-[23px] w-10 shrink-0 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45",
+          "relative h-[23px] w-10 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-45",
           checked ? "bg-purple-600" : "bg-slate-300",
         )}
       >

@@ -67,7 +67,7 @@ export function Select({
         disabled={disabled}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex w-full items-center justify-between gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 shadow-sm hover:border-slate-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-slate-100",
+          "flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 shadow-sm hover:border-slate-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-slate-100",
           className,
         )}
       >
@@ -85,7 +85,7 @@ export function Select({
               type="button"
               disabled={o.disabled}
               onClick={() => selectValue(o.value)}
-              className={`flex w-full items-center justify-between gap-2 px-3 py-1.5 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:text-slate-400 ${
+              className={`flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:text-slate-400 ${
                 o.value === current ? "bg-purple-50 font-semibold text-purple-700" : "text-slate-700 hover:bg-slate-50"
               }`}
             >
